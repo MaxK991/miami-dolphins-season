@@ -31,118 +31,169 @@ main{padding:16px 0 30px}.summary,.panel{background:#fff;border:1px solid var(--
 .seed img{width:27px;height:27px;object-fit:contain}.seed .rank{font-weight:950;color:#6a7b7e}.seed .record{text-align:right;font-weight:900}
 .seed.mia{background:#e8f5f5;border-radius:10px;color:#006a72}
 @media(max-width:650px){.playoff-grid{grid-template-columns:1fr}}
+
+.season select{appearance:none;background:transparent;color:#fff;border:0;outline:0;font:inherit;font-weight:800;cursor:pointer}
+.season option{color:#102629;background:#fff}
+.errorbox{padding:24px;text-align:center;color:#6a7b7e}
 </style></head><body><header><div class="container"><div class="top"><div class="brand">
-<img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><div><div class="title">MIAMI DOLPHINS</div><div class="subtitle">SEASON HUB · deutsche Zeit</div></div></div>
-<div class="season">Saison 2026　⌄</div></div>
+<img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo">
+<div><div class="title">MIAMI DOLPHINS</div><div class="subtitle">SEASON HUB · deutsche Zeit</div></div></div>
+<div class="season"><select id="seasonSelect" aria-label="Saison auswählen">
+<option value="2026">Saison 2026</option><option value="2025">Saison 2025</option><option value="2024">Saison 2024</option>
+</select></div></div>
 <nav class="nav">
 <a class="active" href="index.html">📅 SPIELPLAN</a>
 <a class="" href="tabelle.html">🏆 TABELLE</a>
 <a class="" href="playoffs.html">🏈 PLAYOFFS</a>
 </nav></div></header>
-<main class="container"><section class="summary"><h1>📅 SAISON 2026</h1><p><b>Preseason:</b> 13.–29.08.2026 &nbsp;|&nbsp; <b>Regular Season:</b> 13.09.2026–10.01.2027 &nbsp;|&nbsp; Playoffs danach</p><div class="pills"><span class="pill">PRESEASON</span><span class="pill">REGULAR SEASON</span><span class="pill">PLAYOFFS</span><span class="pill">SUPER BOWL</span></div></section><div id="scheduleBox"><div class="loading">Lade aktuellen NFL-Spielplan …</div></div><div class="note"><b>🔄 Automatisch:</b> Der Spielplan und Ergebnisse werden beim Öffnen direkt aus den aktuellen NFL-Spieldaten geladen. Du musst auf der Website nichts manuell eintragen.</div><div id="updated" style="margin-top:8px;color:var(--muted);font-size:9px"></div></main><footer class="container">Private Miami Dolphins Season Hub · 2026</footer><script>
+<main class="container"><section class="summary"><h1>📅 SAISON <span id="yearTitle">2026</span></h1><p id="seasonSummary"><b>Preseason:</b> 13.–29.08.2026 &nbsp;|&nbsp; <b>Regular Season:</b> 13.09.2026–10.01.2027 &nbsp;|&nbsp; Playoffs danach</p><div class="pills"><span class="pill">PRESEASON</span><span class="pill">REGULAR SEASON</span><span class="pill">PLAYOFFS</span><span class="pill">SUPER BOWL</span></div></section>
+<div id="scheduleBox"><div class="loading">Lade aktuellen NFL-Spielplan …</div></div>
+<div class="note"><b>🔄 Automatisch:</b> Spielplan und Ergebnisse werden beim Öffnen direkt aus aktuellen NFL-Daten geladen.</div><div id="updated" style="margin-top:8px;color:var(--muted);font-size:9px"></div></main><footer class="container">Private Miami Dolphins Season Hub · 2026</footer>
+<script>
 const API="https://site.api.espn.com/apis/site/v2/sports/football/nfl";
+const MIA_ID="15";
 const NFLLOGO=a=>`https://static.www.nfl.com/league/api/clubs/logos/${a}.svg`;
 const TZ="Europe/Berlin";
+const params=new URLSearchParams(location.search);
+let SEASON=Number(params.get("season")||2026);
+
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
 function germanDate(iso){
-  if(!iso) return {date:"TBD",day:"TBD",time:"TBD"};
-  const d=new Date(iso);
-  return {date:new Intl.DateTimeFormat("de-DE",{timeZone:TZ,day:"2-digit",month:"2-digit",year:"numeric"}).format(d),
-          day:new Intl.DateTimeFormat("de-DE",{timeZone:TZ,weekday:"long"}).format(d),
-          time:new Intl.DateTimeFormat("de-DE",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(d)};
+ if(!iso)return {date:"TBD",day:"TBD",time:"TBD"};
+ const d=new Date(iso);
+ return {
+  date:new Intl.DateTimeFormat("de-DE",{timeZone:TZ,day:"2-digit",month:"2-digit",year:"numeric"}).format(d),
+  day:new Intl.DateTimeFormat("de-DE",{timeZone:TZ,weekday:"long"}).format(d),
+  time:new Intl.DateTimeFormat("de-DE",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(d)
+ };
 }
-function seasonTypeName(t){return t===1?"PRESEASON":t===2?"REGULAR SEASON":"PLAYOFFS";}
+function seasonTypeName(t){return t===1?"PRESEASON":t===2?"REGULAR SEASON":t===3?"PLAYOFFS":"OFFSEASON";}
+function seasonText(){
+ const starts={2024:"27.07.2024",2025:"31.07.2025",2026:"13.08.2026"};
+ const regular={2024:"05.09.2024–05.01.2025",2025:"05.09.2025–04.01.2026",2026:"13.09.2026–10.01.2027"};
+ return {pre:starts[SEASON]||"",reg:regular[SEASON]||""};
+}
 function eventCard(ev){
-  const c=ev.competitions?.[0], teams=c?.competitors||[];
-  const mia=teams.find(x=>x.team?.abbreviation==="MIA");
-  const opp=teams.find(x=>x.team?.abbreviation!=="MIA");
-  if(!mia||!opp)return "";
-  const home=mia.homeAway==="home", venue=c.venue?.fullName||c.venue?.address?.city||"Stadion noch offen";
-  const city=c.venue?.address?.city||c.venue?.address?.state||"";
-  const dt=germanDate(ev.date);
-  const done=c.status?.type?.completed===true||c.status?.type?.state==="post";
-  let result="";
-  if(done){
-    const ms=Number(mia.score), os=Number(opp.score);
-    result=`<div class="result"><span class="${ms>os?"win":"loss"}">${ms>os?"SIEG":"NIEDERLAGE"}</span><b>${os} : ${ms}</b></div>`;
-  }
-  const phase=seasonTypeName(ev.season?.type||0);
-  const week=ev.week?.text||ev.week?.number?`WEEK ${ev.week.number}`:"";
-  return `<article class="game">
-    <div class="head"><span class="week">${esc(week)}</span><span class="ha">${home?"🏠 HEIMSPIEL":"✈️ AUSWÄRTSSPIEL"}</span></div>
-    <div class="match">
-      <div class="team"><img src="${NFLLOGO(esc(opp.team.abbreviation))}" alt="${esc(opp.team.displayName)} Logo"><strong>${esc(opp.team.displayName)}</strong><small>${esc(opp.team.abbreviation)}</small></div>
-      <div class="vs">${home?"VS":"AT"}</div>
-      <div class="team"><img src="${NFLLOGO("MIA")}" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div>
-    </div>
-    ${result}
-    <div class="meta"><div><b>${dt.date}</b><small>${esc(dt.day)}</small></div><div><b>🏟️ ${esc(venue)}</b><small>📍 ${esc(city)}</small></div><div class="time"><b>${dt.time}</b><small>deutsche Zeit</small></div></div>
-  </article>`;
+ const c=ev.competitions?.[0], teams=c?.competitors||[];
+ const mia=teams.find(x=>x.team?.abbreviation==="MIA");
+ const opp=teams.find(x=>x.team?.abbreviation!=="MIA");
+ if(!mia||!opp)return "";
+ const home=mia.homeAway==="home";
+ const venue=c.venue?.fullName||c.venue?.address?.city||"Stadion noch offen";
+ const city=c.venue?.address?.city||c.venue?.address?.state||"";
+ const dt=germanDate(ev.date);
+ const done=c.status?.type?.completed===true||c.status?.type?.state==="post";
+ let result="";
+ if(done){
+  const ms=Number(mia.score), os=Number(opp.score);
+  result=`<div class="result"><span class="${ms>os?"win":"loss"}">${ms>os?"SIEG":"NIEDERLAGE"}</span><b>${os} : ${ms}</b></div>`;
+ }
+ const week=ev.week?.text || (ev.week?.number?`WEEK ${ev.week.number}`:"");
+ return `<article class="game">
+  <div class="head"><span class="week">${esc(week)}</span><span class="ha">${home?"🏠 HEIMSPIEL":"✈️ AUSWÄRTSSPIEL"}</span></div>
+  <div class="match">
+   <div class="team"><img src="${NFLLOGO(esc(opp.team.abbreviation))}" alt="${esc(opp.team.displayName)} Logo"><strong>${esc(opp.team.displayName)}</strong><small>${esc(opp.team.abbreviation)}</small></div>
+   <div class="vs">${home?"VS":"AT"}</div>
+   <div class="team"><img src="${NFLLOGO("MIA")}" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div>
+  </div>
+  ${result}
+  <div class="meta"><div><b>${dt.date}</b><small>${esc(dt.day)}</small></div><div><b>🏟️ ${esc(venue)}</b><small>📍 ${esc(city)}</small></div><div class="time"><b>${dt.time}</b><small>deutsche Zeit</small></div></div>
+ </article>`;
+}
+async function fetchTeamSchedule(teamId, season, type){
+ const url=`${API}/teams/${teamId}/schedule?season=${season}&seasontype=${type}`;
+ const r=await fetch(url,{cache:"no-store"});
+ if(!r.ok)throw new Error(`NFL API ${r.status}`);
+ const j=await r.json();
+ return (j.events||[]).map(e=>({...e,_type:type}));
 }
 async function loadSchedule(){
  const box=document.getElementById("scheduleBox");
  try{
-  const r=await fetch(`${API}/teams/mia/schedule?season=2026`,{cache:"no-store"});
-  if(!r.ok) throw new Error();
-  const j=await r.json();
-  const events=j.events||[];
-  const groups={1:[],2:[],3:[]};
-  events.forEach(e=>{const t=e.season?.type; if(groups[t])groups[t].push(e);});
+  const [pre,reg,post]=await Promise.all([1,2,3].map(t=>fetchTeamSchedule(MIA_ID,SEASON,t)));
+  const groups={1:pre,2:reg,3:post};
   let out="";
   for(const t of [1,2,3]){
-    if(!groups[t].length) continue;
-    out+=`<div class="section"><b>${seasonTypeName(t)}</b><span>${t===1?"Vorbereitung":t===2?"Pflichtspiele":"Playoffs"}</span></div>`;
-    out+=groups[t].map(eventCard).join("");
+   if(!groups[t].length)continue;
+   out+=`<div class="section"><b>${seasonTypeName(t)}</b><span>${t===1?"Vorbereitung":t===2?"Pflichtspiele":"Playoffs"}</span></div>`;
+   out+=groups[t].map(eventCard).join("");
   }
-  box.innerHTML=out||'<div class="loading">Aktuell keine Spiele verfügbar.</div>';
+  box.innerHTML=out||'<div class="loading">Für diese Saison sind aktuell keine Dolphins-Spiele verfügbar.</div>';
   document.getElementById("updated").textContent="Live aktualisiert: "+new Date().toLocaleString("de-DE");
  }catch(e){
-  box.innerHTML='<div class="loading">Die aktuellen NFL-Daten konnten gerade nicht geladen werden. Bitte später erneut öffnen.</div>';
+  box.innerHTML='<div class="errorbox">Die aktuellen NFL-Daten konnten gerade nicht geladen werden. Bitte die Seite einmal neu laden.</div>';
  }
 }
-function flattenEntries(node,out=[]){
- if(!node||typeof node!=="object")return out;
- if(Array.isArray(node)) {node.forEach(x=>flattenEntries(x,out));return out;}
- if(node.team?.abbreviation && Array.isArray(node.stats)) out.push(node);
- for(const v of Object.values(node)) if(v&&typeof v==="object") flattenEntries(v,out);
- return out;
+async function getRegularRecord(teamId, season){
+ const events=await fetchTeamSchedule(teamId,season,2);
+ let w=0,l=0,t=0;
+ for(const ev of events){
+  const c=ev.competitions?.[0], me=c?.competitors?.find(x=>x.team?.id===String(teamId));
+  if(!me || !c?.status?.type?.completed)continue;
+  const other=c.competitors.find(x=>x.team?.id!==String(teamId));
+  if(!other)continue;
+  const ms=Number(me.score), os=Number(other.score);
+  if(ms>os)w++; else if(ms<os)l++; else t++;
+ }
+ return {w,l,t,pct:(w+t/2)/(w+l+t||1)};
 }
-function statsMap(e){const s={};(e.stats||[]).forEach(x=>s[x.name]=x.value);return s;}
-async function getStandings(){
- const r=await fetch(`${API.replace("/site/v2","/v2")}/standings?season=2026`,{cache:"no-store"});
- if(!r.ok)throw new Error();
- const j=await r.json();
- return flattenEntries(j,[]).filter((e,i,a)=>a.findIndex(x=>x.team.abbreviation===e.team.abbreviation)===i).map(e=>{
-  const s=statsMap(e);return {a:e.team.abbreviation,n:e.team.displayName,w:Number(s.wins||0),l:Number(s.losses||0),t:Number(s.ties||0),p:Number(s.winPercent||0),logo:e.team.logos?.[0]?.href||NFLLOGO(e.team.abbreviation)};
- });
+const AFC={
+ BUF:2,MIA:15,NE:17,NYJ:20,BAL:33,CIN:4,CLE:5,PIT:23,HOU:34,IND:11,JAX:30,TEN:10,
+ DEN:7,KC:12,LV:13,LAC:24
+};
+const NAMES={
+ BUF:"Buffalo Bills",MIA:"Miami Dolphins",NE:"New England Patriots",NYJ:"New York Jets",
+ BAL:"Baltimore Ravens",CIN:"Cincinnati Bengals",CLE:"Cleveland Browns",PIT:"Pittsburgh Steelers",
+ HOU:"Houston Texans",IND:"Indianapolis Colts",JAX:"Jacksonville Jaguars",TEN:"Tennessee Titans",
+ DEN:"Denver Broncos",KC:"Kansas City Chiefs",LV:"Las Vegas Raiders",LAC:"Los Angeles Chargers"
+};
+function row(x,i){return `<tr class="${x.a==="MIA"?"mia":""}"><td>${i+1}</td><td><div class="teamname"><img src="${NFLLOGO(x.a)}" alt="">${esc(x.n)}</div></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${x.pct.toFixed(3)}</td></tr>`;}
+async function buildRecords(season, abbrevs){
+ return Promise.all(abbrevs.map(async a=>{
+  const r=await getRegularRecord(AFC[a],season);
+  return {a,n:NAMES[a],...r};
+ }));
 }
-function row(x,i){return `<tr class="${x.a==="MIA"?"mia":""}"><td>${i+1}</td><td><div class="teamname"><img src="${x.logo}" alt="">${esc(x.n)}</div></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${x.p.toFixed(3)}</td></tr>`;}
 async function loadTable(){
  const body=document.getElementById("tbody");
  try{
-  const all=await getStandings();
-  const east=all.filter(x=>["BUF","MIA","NE","NYJ"].includes(x.a)).sort((a,b)=>(b.p-a.p)||(b.w-a.w)||(a.l-b.l));
-  body.innerHTML=east.map((x,i)=>row(x,i)).join("");
+  const east=await buildRecords(SEASON,["BUF","MIA","NE","NYJ"]);
+  east.sort((a,b)=>(b.pct-a.pct)||(b.w-a.w)||(a.l-b.l));
+  body.innerHTML=east.map(row).join("");
   document.getElementById("stamp").textContent="Live aktualisiert: "+new Date().toLocaleString("de-DE");
- }catch(e){body.innerHTML='<tr><td colspan="6">Aktuelle Tabelle konnte nicht geladen werden.</td></tr>';}
+ }catch(e){body.innerHTML='<tr><td colspan="6">Aktuelle Tabelle konnte gerade nicht geladen werden.</td></tr>';}
 }
 async function loadPlayoffs(){
  const box=document.getElementById("playoffBox");
  try{
-  const all=await getStandings();
-  const mia=all.find(x=>x.a==="MIA");
-  const afc=all.filter(x=>["BUF","MIA","NE","NYJ","BAL","CIN","CLE","PIT","HOU","IND","JAX","TEN","DEN","KC","LV","LAC"].includes(x.a))
-    .sort((a,b)=>(b.p-a.p)||(b.w-a.w)||(a.l-b.l));
-  const started=all.some(x=>x.w||x.l||x.t);
-  if(!mia){box.innerHTML="Keine Dolphins-Daten verfügbar.";return;}
+  const afc=await buildRecords(SEASON,Object.keys(AFC));
+  afc.sort((a,b)=>(b.pct-a.pct)||(b.w-a.w)||(a.l-b.l));
+  const mia=afc.find(x=>x.a==="MIA");
+  const started=afc.some(x=>x.w||x.l||x.t);
   const seed=afc.findIndex(x=>x.a==="MIA")+1;
-  box.innerHTML=`<div style="text-align:center;padding:18px 5px"><img src="${mia.logo}" style="width:85px;height:85px;object-fit:contain"><h2 style="margin:7px 0">Miami Dolphins</h2>
-  <div style="font-size:22px;font-weight:950;color:var(--teal)">${started?`#${seed} AFC Seed`:"Regular Season noch nicht gestartet"}</div>
-  <p>${started?`Aktuelle Bilanz: ${mia.w}-${mia.l}${mia.t?"-"+mia.t:""}`:"Die Preseason-Bilanz zählt nicht für die Playoff-Platzierung."}</p></div>
-  <div class="playoff-grid"><div class="panel"><h2 style="margin-top:0">AFC Playoff Picture</h2>${afc.slice(0,7).map((x,i)=>`<div class="seed ${x.a==="MIA"?"mia":""}"><span class="rank">${i+1}</span><span class="teamname"><img src="${x.logo}">${esc(x.n)}</span><span class="record">${x.w}-${x.l}</span></div>`).join("")}</div>
-  <div class="panel"><h2 style="margin-top:0">Miami Status</h2><p>${started?"Die Dolphins werden anhand der aktuellen AFC-Bilanz eingeordnet.":"Mit Start der Regular Season wird hier automatisch der aktuelle AFC-Seed angezeigt."}</p></div></div>
-  <div class="note"><b>🔄 Live:</b> Diese Seite lädt die aktuelle Tabelle beim Öffnen neu.</div>`;
- }catch(e){box.innerHTML='<div class="loading">Aktuelle Playoff-Daten konnten nicht geladen werden.</div>';}
+  box.innerHTML=`<div style="text-align:center;padding:18px 5px">
+   <img src="${NFLLOGO("MIA")}" style="width:85px;height:85px;object-fit:contain">
+   <h2 style="margin:7px 0">Miami Dolphins</h2>
+   <div style="font-size:22px;font-weight:950;color:var(--teal)">${started?`#${seed} AFC Seed`:"Regular Season noch nicht gestartet"}</div>
+   <p>${started?`Aktuelle Bilanz: ${mia.w}-${mia.l}${mia.t?"-"+mia.t:""}`:"Preseason-Ergebnisse zählen nicht für die Playoff-Platzierung."}</p>
+  </div>
+  <div class="playoff-grid"><div class="panel"><h2 style="margin-top:0">AFC Playoff Picture</h2>
+  ${afc.slice(0,7).map((x,i)=>`<div class="seed ${x.a==="MIA"?"mia":""}"><span class="rank">${i+1}</span><span class="teamname"><img src="${NFLLOGO(x.a)}">${esc(x.n)}</span><span class="record">${x.w}-${x.l}</span></div>`).join("")}
+  </div><div class="panel"><h2 style="margin-top:0">Miami Status</h2><p>${started?"Die Dolphins werden anhand der aktuellen Regular-Season-Bilanz eingeordnet.":"Mit Beginn der Regular Season wird hier automatisch der aktuelle AFC-Seed angezeigt."}</p></div></div>
+  <div class="note"><b>🔄 Live:</b> Diese Seite lädt die aktuelle Regular-Season-Tabelle beim Öffnen neu.</div>`;
+ }catch(e){box.innerHTML='<div class="errorbox">Aktuelle Playoff-Daten konnten gerade nicht geladen werden. Bitte die Seite neu laden.</div>';}
 }
-setInterval(()=>{ if(location.pathname.endsWith("index.html")||location.pathname.endsWith("/"))loadSchedule(); },86400000);
-loadSchedule();</script></body></html>
+function setupSeason(){
+ const s=document.getElementById("seasonSelect");
+ if(!s)return;
+ s.value=String(SEASON);
+ s.addEventListener("change",()=>{const u=new URL(location.href);u.searchParams.set("season",s.value);location.href=u.toString();});
+ document.querySelectorAll(".nav a").forEach(a=>{
+  const u=new URL(a.href,location.href);u.searchParams.set("season",SEASON);a.href=u.toString();
+ });
+ const st=seasonText();
+ const p=document.getElementById("seasonSummary");
+ if(p)p.innerHTML=`<b>Preseason:</b> ${SEASON===2026?"13.–29.08.2026":st.pre} &nbsp;|&nbsp; <b>Regular Season:</b> ${st.reg||"NFL-Saison"} &nbsp;|&nbsp; Playoffs danach`;
+}
+setupSeason();
+document.getElementById("yearTitle").textContent=SEASON;loadSchedule();</script></body></html>
