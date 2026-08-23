@@ -1,0 +1,36 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#008e97"><title>Miami Dolphins · Playoffs</title><style>
+:root{--teal:#008e97;--deep:#006a72;--bg:#f2f6f6;--ink:#102629;--muted:#6a7b7e;--line:#dce5e5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:linear-gradient(135deg,#005c64,#008e97,#00a5aa);color:#fff;box-shadow:0 5px 18px #003f4330}
+.container{width:min(1080px,calc(100% - 24px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 0 10px}
+.brand{display:flex;align-items:center;gap:11px}.brand img{width:62px;height:62px;object-fit:contain}.title{font-size:25px;font-weight:950}.subtitle{font-size:12px;opacity:.9}
+.season{background:#ffffff18;color:#fff;border:1px solid #ffffff80;border-radius:11px;padding:10px 12px;font-weight:800}
+.nav{display:flex;border-top:1px solid #ffffff25}.nav a{flex:1;text-align:center;color:#fff;text-decoration:none;font-size:12px;font-weight:900;padding:11px 3px}.nav a.active{background:#ffffff16;border-bottom:3px solid #fff}
+main{padding:16px 0 30px}.summary,.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px 16px}.summary h1,.panel h1{margin:0 0 5px;font-size:22px}.summary p,.panel p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.pills{display:flex;gap:7px;overflow:auto;margin-top:12px}.pill{white-space:nowrap;background:#e8f5f5;color:var(--deep);padding:7px 10px;border-radius:999px;font-size:10px;font-weight:900}
+.section{margin:20px 2px 9px;border-bottom:2px solid #d0e0e1;padding:8px 2px;color:var(--deep)}.section b{font-size:18px}.section span{margin-left:7px;color:var(--muted);font-size:11px}
+.game{background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px 12px;margin:8px 0;box-shadow:0 5px 15px #123b3d0a}.head{display:flex;justify-content:space-between;align-items:center}.week{font-size:9px;font-weight:900;background:#eaf4f4;color:var(--deep);padding:5px 8px;border-radius:7px}.ha{font-size:9px;color:var(--deep);font-weight:900}
+.match{display:grid;grid-template-columns:1fr 38px 1fr;align-items:center;gap:5px;text-align:center;padding:8px 0 5px}.team{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}.team img{width:55px;height:55px;object-fit:contain;flex:none}.team strong{font-size:13px;line-height:1.12}.team small{font-size:9px;color:var(--muted);font-weight:800}.vs{font-size:10px;font-weight:950;color:var(--deep);border:1px solid #cfe0e1;border-radius:999px;padding:6px 4px}
+.result{display:flex;flex-direction:column;align-items:center;gap:3px;margin:3px 0 10px;text-align:center}.result span{font-size:9px;font-weight:950;padding:4px 8px;border-radius:999px}.result b{font-size:24px;letter-spacing:.5px}.loss{background:#ffe8e6;color:#b32f2a}.win{background:#e4f6ea;color:#18743c}
+.meta{border-top:1px solid var(--line);padding-top:9px;display:grid;grid-template-columns:130px 1fr 95px;gap:8px;align-items:center}.meta div{display:flex;flex-direction:column;gap:2px}.meta b{font-size:11px;line-height:1.25}.meta small{font-size:9px;color:var(--muted);line-height:1.25}.time{text-align:right}.time b{font-size:19px;color:var(--teal)}
+.bye{display:grid;grid-template-columns:105px 1fr;gap:10px;align-items:center;background:#eaf3f3;border:1px dashed #b8cccd;border-radius:14px;padding:12px;margin:8px 0}.bye div{display:flex;flex-direction:column;gap:2px}.bye b{font-size:13px}.bye small{font-size:10px;color:var(--muted)}
+.table-scroll{overflow:auto}.standings{width:100%;border-collapse:collapse;font-size:12px}.standings th,.standings td{padding:9px 7px;border-bottom:1px solid #edf1f1;text-align:center}.standings th:nth-child(2),.standings td:nth-child(2){text-align:left}.standings th{font-size:10px;color:var(--muted)}.mia{background:#e8f5f5;color:#006a72;font-weight:900}
+.teamname{display:flex;align-items:center;gap:7px;white-space:nowrap}.teamname img{width:28px;height:28px;object-fit:contain}
+.subtabs{display:flex;gap:6px;margin:14px 0 10px}.subtabs button{border:0;background:#e8f5f5;color:var(--deep);padding:8px 12px;border-radius:999px;font-size:10px;font-weight:900;cursor:pointer}.subtabs button.active{background:var(--deep);color:#fff}
+.note{margin-top:16px;background:#fff8ed;border:1px solid #eedcc4;border-radius:12px;padding:11px;color:#765b38;font-size:10px;line-height:1.45}footer{padding:0 0 28px;color:var(--muted);font-size:10px}
+@media(max-width:650px){.container{width:calc(100% - 14px)}.brand img{width:52px;height:52px}.title{font-size:21px}.subtitle{font-size:10px}.top{gap:8px}.season{font-size:12px;padding:8px}.nav a{font-size:10px}.match{grid-template-columns:1fr 32px 1fr}.team{flex-direction:column;gap:3px}.team img{width:48px;height:48px}.team strong{font-size:12px}.meta{grid-template-columns:80px 1fr 70px}.meta b{font-size:10px}.time b{font-size:17px}}
+</style></head><body>
+<header><div class="container"><div class="top"><div class="brand">
+<img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><div><div class="title">MIAMI DOLPHINS</div><div class="subtitle">SEASON HUB · deutsche Zeit</div></div></div>
+<div class="season">Saison 2026　⌄</div></div>
+<nav class="nav">
+<a class="" href="index.html">📅 SPIELPLAN</a>
+<a class="" href="tabelle.html">🏆 TABELLE</a>
+<a class="active" href="playoffs.html">🏈 PLAYOFFS</a>
+</nav></div></header><main class="container"><section class="panel"><h1>🏈 PLAYOFF PICTURE</h1>
+<p><b>2026 NFL Playoffs</b></p>
+<div style="text-align:center;padding:28px 10px"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo" style="width:90px;height:90px;object-fit:contain">
+<h2 style="margin:8px 0">Miami Dolphins</h2><div style="font-size:20px;font-weight:900;color:var(--teal)">Regular Season noch nicht gestartet</div>
+<p style="max-width:560px;margin:8px auto;color:var(--muted)">Die Playoff-Platzierungen werden erst mit den Spielen der Regular Season relevant. Sobald die Regular Season läuft, zeigt diese Seite Miamis aktuellen AFC-Seed und den Playoff-Status.</p></div>
+<div class="note"><b>Aktuell:</b> Die Dolphins stehen in der Preseason bei 0–2. Das ist noch keine reguläre Saisonbilanz.</div>
+</section></main><footer class="container">Private Miami Dolphins Season Hub · 2026</footer></body></html>

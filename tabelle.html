@@ -1,0 +1,52 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#008e97"><title>Miami Dolphins · Tabelle</title><style>
+:root{--teal:#008e97;--deep:#006a72;--bg:#f2f6f6;--ink:#102629;--muted:#6a7b7e;--line:#dce5e5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:linear-gradient(135deg,#005c64,#008e97,#00a5aa);color:#fff;box-shadow:0 5px 18px #003f4330}
+.container{width:min(1080px,calc(100% - 24px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 0 10px}
+.brand{display:flex;align-items:center;gap:11px}.brand img{width:62px;height:62px;object-fit:contain}.title{font-size:25px;font-weight:950}.subtitle{font-size:12px;opacity:.9}
+.season{background:#ffffff18;color:#fff;border:1px solid #ffffff80;border-radius:11px;padding:10px 12px;font-weight:800}
+.nav{display:flex;border-top:1px solid #ffffff25}.nav a{flex:1;text-align:center;color:#fff;text-decoration:none;font-size:12px;font-weight:900;padding:11px 3px}.nav a.active{background:#ffffff16;border-bottom:3px solid #fff}
+main{padding:16px 0 30px}.summary,.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px 16px}.summary h1,.panel h1{margin:0 0 5px;font-size:22px}.summary p,.panel p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.pills{display:flex;gap:7px;overflow:auto;margin-top:12px}.pill{white-space:nowrap;background:#e8f5f5;color:var(--deep);padding:7px 10px;border-radius:999px;font-size:10px;font-weight:900}
+.section{margin:20px 2px 9px;border-bottom:2px solid #d0e0e1;padding:8px 2px;color:var(--deep)}.section b{font-size:18px}.section span{margin-left:7px;color:var(--muted);font-size:11px}
+.game{background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px 12px;margin:8px 0;box-shadow:0 5px 15px #123b3d0a}.head{display:flex;justify-content:space-between;align-items:center}.week{font-size:9px;font-weight:900;background:#eaf4f4;color:var(--deep);padding:5px 8px;border-radius:7px}.ha{font-size:9px;color:var(--deep);font-weight:900}
+.match{display:grid;grid-template-columns:1fr 38px 1fr;align-items:center;gap:5px;text-align:center;padding:8px 0 5px}.team{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}.team img{width:55px;height:55px;object-fit:contain;flex:none}.team strong{font-size:13px;line-height:1.12}.team small{font-size:9px;color:var(--muted);font-weight:800}.vs{font-size:10px;font-weight:950;color:var(--deep);border:1px solid #cfe0e1;border-radius:999px;padding:6px 4px}
+.result{display:flex;flex-direction:column;align-items:center;gap:3px;margin:3px 0 10px;text-align:center}.result span{font-size:9px;font-weight:950;padding:4px 8px;border-radius:999px}.result b{font-size:24px;letter-spacing:.5px}.loss{background:#ffe8e6;color:#b32f2a}.win{background:#e4f6ea;color:#18743c}
+.meta{border-top:1px solid var(--line);padding-top:9px;display:grid;grid-template-columns:130px 1fr 95px;gap:8px;align-items:center}.meta div{display:flex;flex-direction:column;gap:2px}.meta b{font-size:11px;line-height:1.25}.meta small{font-size:9px;color:var(--muted);line-height:1.25}.time{text-align:right}.time b{font-size:19px;color:var(--teal)}
+.bye{display:grid;grid-template-columns:105px 1fr;gap:10px;align-items:center;background:#eaf3f3;border:1px dashed #b8cccd;border-radius:14px;padding:12px;margin:8px 0}.bye div{display:flex;flex-direction:column;gap:2px}.bye b{font-size:13px}.bye small{font-size:10px;color:var(--muted)}
+.table-scroll{overflow:auto}.standings{width:100%;border-collapse:collapse;font-size:12px}.standings th,.standings td{padding:9px 7px;border-bottom:1px solid #edf1f1;text-align:center}.standings th:nth-child(2),.standings td:nth-child(2){text-align:left}.standings th{font-size:10px;color:var(--muted)}.mia{background:#e8f5f5;color:#006a72;font-weight:900}
+.teamname{display:flex;align-items:center;gap:7px;white-space:nowrap}.teamname img{width:28px;height:28px;object-fit:contain}
+.subtabs{display:flex;gap:6px;margin:14px 0 10px}.subtabs button{border:0;background:#e8f5f5;color:var(--deep);padding:8px 12px;border-radius:999px;font-size:10px;font-weight:900;cursor:pointer}.subtabs button.active{background:var(--deep);color:#fff}
+.note{margin-top:16px;background:#fff8ed;border:1px solid #eedcc4;border-radius:12px;padding:11px;color:#765b38;font-size:10px;line-height:1.45}footer{padding:0 0 28px;color:var(--muted);font-size:10px}
+@media(max-width:650px){.container{width:calc(100% - 14px)}.brand img{width:52px;height:52px}.title{font-size:21px}.subtitle{font-size:10px}.top{gap:8px}.season{font-size:12px;padding:8px}.nav a{font-size:10px}.match{grid-template-columns:1fr 32px 1fr}.team{flex-direction:column;gap:3px}.team img{width:48px;height:48px}.team strong{font-size:12px}.meta{grid-template-columns:80px 1fr 70px}.meta b{font-size:10px}.time b{font-size:17px}}
+</style></head><body>
+<header><div class="container"><div class="top"><div class="brand">
+<img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><div><div class="title">MIAMI DOLPHINS</div><div class="subtitle">SEASON HUB · deutsche Zeit</div></div></div>
+<div class="season">Saison 2026　⌄</div></div>
+<nav class="nav">
+<a class="" href="index.html">📅 SPIELPLAN</a>
+<a class="active" href="tabelle.html">🏆 TABELLE</a>
+<a class="" href="playoffs.html">🏈 PLAYOFFS</a>
+</nav></div></header><main class="container"><section class="panel"><h1>🏆 AKTUELLE TABELLE</h1><p><b>Preseason 2026 · AFC East</b></p>
+<div class="table-scroll"><table class="standings"><thead><tr><th>#</th><th>TEAM</th><th>W</th><th>L</th><th>T</th><th>PCT</th></tr></thead><tbody id="tbody"><tr class=""><td>1</td><td><div class="teamname"><img src="https://static.www.nfl.com/league/api/clubs/logos/BUF.svg">Buffalo Bills</div></td><td>1</td><td>0</td><td>0</td><td>1.000</td></tr><tr class=""><td>2</td><td><div class="teamname"><img src="https://static.www.nfl.com/league/api/clubs/logos/NE.svg">New England Patriots</div></td><td>0</td><td>0</td><td>1</td><td>0.500</td></tr><tr class=""><td>3</td><td><div class="teamname"><img src="https://static.www.nfl.com/league/api/clubs/logos/NYJ.svg">New York Jets</div></td><td>0</td><td>1</td><td>0</td><td>0.000</td></tr><tr class="mia"><td>4</td><td><div class="teamname"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg">Miami Dolphins</div></td><td>0</td><td>1</td><td>0</td><td>0.000</td></tr></tbody></table></div>
+<div id="stamp" class="status" style="margin-top:10px;color:var(--muted);font-size:10px">Offizielle NFL-Preseason-Tabelle · Stand 23.08.2026</div>
+<div class="note">Mit Beginn der Regular Season wechselt die Anzeige automatisch auf die reguläre Saisontabelle. Miami ist immer hervorgehoben.</div>
+</section></main><footer class="container">Private Miami Dolphins Season Hub · 2026</footer>
+<script>
+async function liveTable(){
+ try{
+  const r=await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/standings?region=us&lang=en&contentorigin=espn",{cache:"no-store"});
+  if(!r.ok) return;
+  const j=await r.json(), all=[];
+  (j.children||[]).forEach(c=>(c.standings?.entries||[]).forEach(e=>{
+   const t=e.team||{}, s={}; (e.stats||[]).forEach(x=>s[x.name]=x.value);
+   if(["BUF","NE","NYJ","MIA"].includes(t.abbreviation)) all.push({n:t.displayName,a:t.abbreviation,w:s.wins||0,l:s.losses||0,t:s.ties||0,p:Number(s.winPercent||0),logo:t.logos?.[0]?.href||""});
+  }));
+  if(all.length<4) return;
+  all.sort((a,b)=>(b.p-a.p)||(b.w-a.w)||(a.l-b.l));
+  document.getElementById("tbody").innerHTML=all.map((x,i)=>`<tr class="${x.a==="MIA"?"mia":""}"><td>${i+1}</td><td><div class="teamname"><img src="${x.logo||""}">${x.n}</div></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${x.p.toFixed(3)}</td></tr>`).join("");
+  document.getElementById("stamp").textContent="Live geprüft: "+new Date().toLocaleString("de-DE");
+ }catch(e){}
+}
+liveTable();
+</script></body></html>
