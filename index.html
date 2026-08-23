@@ -23,7 +23,7 @@ main{padding:16px 0 30px}.summary,.panel{background:#fff;border:1px solid var(--
 .game .result{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin:5px 0 10px}
 .game .result span{font-size:9px;font-weight:950;padding:4px 9px;border-radius:999px}
 .game .result b{font-size:24px;letter-spacing:.5px}
-.game .result .loss{background:#ffe8e6;color:#b32f2a}
+.game .result .loss{background:#ffe8e6;color:#b32f2a}.result .tie{background:#eef2f2;color:#586a6d}
 .game .result .win{background:#e4f6ea;color:#18743c}
 .loading{padding:30px;text-align:center;color:#6a7b7e;font-size:12px}
 .playoff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:15px}
@@ -33,7 +33,7 @@ main{padding:16px 0 30px}.summary,.panel{background:#fff;border:1px solid var(--
 @media(max-width:650px){.playoff-grid{grid-template-columns:1fr}}
 
 .season select{appearance:none;background:transparent;color:#fff;border:0;outline:0;font:inherit;font-weight:800;cursor:pointer}
-.season option{color:#102629;background:#fff}
+.season{position:relative}.season:after{content:"⌄";position:absolute;right:14px;top:50%;transform:translateY(-55%);pointer-events:none;color:#fff;font-weight:900}.season select{font-size:inherit;padding-right:18px}.season option{color:#102629;background:#fff}
 .errorbox{padding:24px;text-align:center;color:#6a7b7e}
 </style></head><body><header><div class="container"><div class="top"><div class="brand">
 <img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo">
@@ -53,6 +53,15 @@ main{padding:16px 0 30px}.summary,.panel{background:#fff;border:1px solid var(--
 const API="https://site.api.espn.com/apis/site/v2/sports/football/nfl";
 const MIA_ID="15";
 const NFLLOGO=a=>`https://static.www.nfl.com/league/api/clubs/logos/${a}.svg`;
+function teamLogo(team, abbr){
+  return team?.logos?.[0]?.href || `https://a.espncdn.com/i/teamlogos/nfl/500/${String(abbr||"").toLowerCase()}.png`;
+}
+function scoreNumber(v){
+  if(v===null||v===undefined||v==="") return null;
+  if(typeof v==="object") v=v.value ?? v.displayValue ?? v.score ?? null;
+  const n=Number(v);
+  return Number.isFinite(n)?n:null;
+}
 const TZ="Europe/Berlin";
 const params=new URLSearchParams(location.search);
 let SEASON=Number(params.get("season")||2026);
@@ -82,19 +91,19 @@ function eventCard(ev){
  const venue=c.venue?.fullName||c.venue?.address?.city||"Stadion noch offen";
  const city=c.venue?.address?.city||c.venue?.address?.state||"";
  const dt=germanDate(ev.date);
- const done=c.status?.type?.completed===true||c.status?.type?.state==="post";
+ const ms=scoreNumber(mia.score), os=scoreNumber(opp.score);
+ const done=(c.status?.type?.completed===true||c.status?.type?.state==="post") && ms!==null && os!==null;
  let result="";
  if(done){
-  const ms=Number(mia.score), os=Number(opp.score);
-  result=`<div class="result"><span class="${ms>os?"win":"loss"}">${ms>os?"SIEG":"NIEDERLAGE"}</span><b>${os} : ${ms}</b></div>`;
+  result=`<div class="result"><span class="${ms>os?"win":ms<os?"loss":"tie"}">${ms>os?"SIEG":ms<os?"NIEDERLAGE":"UNENTSCHIEDEN"}</span><b>${os} : ${ms}</b></div>`;
  }
  const week=ev.week?.text || (ev.week?.number?`WEEK ${ev.week.number}`:"");
  return `<article class="game">
   <div class="head"><span class="week">${esc(week)}</span><span class="ha">${home?"🏠 HEIMSPIEL":"✈️ AUSWÄRTSSPIEL"}</span></div>
   <div class="match">
-   <div class="team"><img src="${NFLLOGO(esc(opp.team.abbreviation))}" alt="${esc(opp.team.displayName)} Logo"><strong>${esc(opp.team.displayName)}</strong><small>${esc(opp.team.abbreviation)}</small></div>
+   <div class="team"><img src="${teamLogo(opp.team,opp.team.abbreviation)}" alt="${esc(opp.team.displayName)} Logo"><strong>${esc(opp.team.displayName)}</strong><small>${esc(opp.team.abbreviation)}</small></div>
    <div class="vs">${home?"VS":"AT"}</div>
-   <div class="team"><img src="${NFLLOGO("MIA")}" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div>
+   <div class="team"><img src="${teamLogo(mia.team,"MIA")}" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div>
   </div>
   ${result}
   <div class="meta"><div><b>${dt.date}</b><small>${esc(dt.day)}</small></div><div><b>🏟️ ${esc(venue)}</b><small>📍 ${esc(city)}</small></div><div class="time"><b>${dt.time}</b><small>deutsche Zeit</small></div></div>
@@ -128,11 +137,13 @@ async function getRegularRecord(teamId, season){
  const events=await fetchTeamSchedule(teamId,season,2);
  let w=0,l=0,t=0;
  for(const ev of events){
-  const c=ev.competitions?.[0], me=c?.competitors?.find(x=>x.team?.id===String(teamId));
-  if(!me || !c?.status?.type?.completed)continue;
-  const other=c.competitors.find(x=>x.team?.id!==String(teamId));
-  if(!other)continue;
-  const ms=Number(me.score), os=Number(other.score);
+  const c=ev.competitions?.[0];
+  if(!c?.status?.type?.completed)continue;
+  const me=c.competitors?.find(x=>String(x.team?.id)===String(teamId));
+  const other=c.competitors?.find(x=>String(x.team?.id)!==String(teamId));
+  if(!me||!other)continue;
+  const ms=scoreNumber(me.score), os=scoreNumber(other.score);
+  if(ms===null||os===null)continue;
   if(ms>os)w++; else if(ms<os)l++; else t++;
  }
  return {w,l,t,pct:(w+t/2)/(w+l+t||1)};
@@ -147,7 +158,7 @@ const NAMES={
  HOU:"Houston Texans",IND:"Indianapolis Colts",JAX:"Jacksonville Jaguars",TEN:"Tennessee Titans",
  DEN:"Denver Broncos",KC:"Kansas City Chiefs",LV:"Las Vegas Raiders",LAC:"Los Angeles Chargers"
 };
-function row(x,i){return `<tr class="${x.a==="MIA"?"mia":""}"><td>${i+1}</td><td><div class="teamname"><img src="${NFLLOGO(x.a)}" alt="">${esc(x.n)}</div></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${x.pct.toFixed(3)}</td></tr>`;}
+function row(x,i){return `<tr class="${x.a==="MIA"?"mia":""}"><td>${i+1}</td><td><div class="teamname"><img src="${teamLogo(null,x.a)}" alt="">${esc(x.n)}</div></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${x.pct.toFixed(3)}</td></tr>`;}
 async function buildRecords(season, abbrevs){
  return Promise.all(abbrevs.map(async a=>{
   const r=await getRegularRecord(AFC[a],season);
@@ -172,13 +183,13 @@ async function loadPlayoffs(){
   const started=afc.some(x=>x.w||x.l||x.t);
   const seed=afc.findIndex(x=>x.a==="MIA")+1;
   box.innerHTML=`<div style="text-align:center;padding:18px 5px">
-   <img src="${NFLLOGO("MIA")}" style="width:85px;height:85px;object-fit:contain">
+   <img src="${teamLogo(null,"MIA")}" style="width:85px;height:85px;object-fit:contain">
    <h2 style="margin:7px 0">Miami Dolphins</h2>
    <div style="font-size:22px;font-weight:950;color:var(--teal)">${started?`#${seed} AFC Seed`:"Regular Season noch nicht gestartet"}</div>
    <p>${started?`Aktuelle Bilanz: ${mia.w}-${mia.l}${mia.t?"-"+mia.t:""}`:"Preseason-Ergebnisse zählen nicht für die Playoff-Platzierung."}</p>
   </div>
   <div class="playoff-grid"><div class="panel"><h2 style="margin-top:0">AFC Playoff Picture</h2>
-  ${afc.slice(0,7).map((x,i)=>`<div class="seed ${x.a==="MIA"?"mia":""}"><span class="rank">${i+1}</span><span class="teamname"><img src="${NFLLOGO(x.a)}">${esc(x.n)}</span><span class="record">${x.w}-${x.l}</span></div>`).join("")}
+  ${afc.slice(0,7).map((x,i)=>`<div class="seed ${x.a==="MIA"?"mia":""}"><span class="rank">${i+1}</span><span class="teamname"><img src="${teamLogo(null,x.a)}">${esc(x.n)}</span><span class="record">${x.w}-${x.l}</span></div>`).join("")}
   </div><div class="panel"><h2 style="margin-top:0">Miami Status</h2><p>${started?"Die Dolphins werden anhand der aktuellen Regular-Season-Bilanz eingeordnet.":"Mit Beginn der Regular Season wird hier automatisch der aktuelle AFC-Seed angezeigt."}</p></div></div>
   <div class="note"><b>🔄 Live:</b> Diese Seite lädt die aktuelle Regular-Season-Tabelle beim Öffnen neu.</div>`;
  }catch(e){box.innerHTML='<div class="errorbox">Aktuelle Playoff-Daten konnten gerade nicht geladen werden. Bitte die Seite neu laden.</div>';}
