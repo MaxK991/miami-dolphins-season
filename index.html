@@ -1,208 +1,33 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#008e97"><title>Miami Dolphins · Season Hub</title>
-<style>
-:root{--teal:#008e97;--deep:#006a72;--orange:#f58220;--bg:#f2f6f6;--ink:#102629;--muted:#6a7b7e;--line:#dce5e5}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-header{background:linear-gradient(135deg,#005c64,#008e97,#00a5aa);color:#fff;position:sticky;top:0;z-index:5;box-shadow:0 5px 18px #003f4330}
-.container{width:min(1080px,calc(100% - 24px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 0 10px}
-.brand{display:flex;align-items:center;gap:11px}.brand img{width:62px;height:62px;object-fit:contain}.title{font-size:25px;font-weight:950}.subtitle{font-size:12px;opacity:.9}
-select{background:#ffffff18;color:#fff;border:1px solid #ffffff80;border-radius:11px;padding:10px 12px;font-weight:800}
-nav{display:flex;border-top:1px solid #ffffff25}nav a{flex:1;text-align:center;color:#fff;text-decoration:none;font-size:12px;font-weight:850;padding:10px 3px}nav a.active{border-bottom:3px solid #fff;background:#ffffff12}
-main{padding:16px 0 28px}.summary{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px 16px}.summary h1{margin:0 0 5px;font-size:22px}.summary p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
-.pills{display:flex;gap:7px;overflow:auto;margin-top:12px}.pill{white-space:nowrap;background:#e8f5f5;color:var(--deep);padding:7px 10px;border-radius:999px;font-size:10px;font-weight:900}
-.section{margin:20px 2px 9px;border-bottom:2px solid #d0e0e1;padding:8px 2px;color:var(--deep)}.section b{font-size:18px}.section span{margin-left:7px;color:var(--muted);font-size:11px;font-weight:600}
-.game{background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px 12px;margin:8px 0;box-shadow:0 5px 15px #123b3d0a}.head{display:flex;justify-content:space-between;align-items:center}.week{font-size:9px;font-weight:900;background:#eaf4f4;color:var(--deep);padding:5px 8px;border-radius:7px}.ha{font-size:9px;color:var(--deep);font-weight:900}
-.match{display:grid;grid-template-columns:1fr 38px 1fr;align-items:center;gap:5px;text-align:center;padding:8px 0 10px}.team{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}.team img{width:55px;height:55px;object-fit:contain;flex:none}.team strong{font-size:13px;line-height:1.12}.team small{font-size:9px;color:var(--muted);font-weight:800}.vs{font-size:10px;font-weight:950;color:var(--deep);border:1px solid #cfe0e1;border-radius:999px;padding:6px 4px}
-.meta{border-top:1px solid var(--line);padding-top:9px;display:grid;grid-template-columns:130px 1fr 95px;gap:8px;align-items:center}.meta div{display:flex;flex-direction:column;gap:2px}.meta b{font-size:11px;line-height:1.25}.meta small{font-size:9px;color:var(--muted);line-height:1.25}.time{text-align:right}.time b{font-size:19px;color:var(--teal)}
-.bye{display:grid;grid-template-columns:105px 1fr;gap:10px;align-items:center;background:#eaf3f3;border:1px dashed #b8cccd;border-radius:14px;padding:12px;margin:8px 0}.bye div{display:flex;flex-direction:column;gap:2px}.bye b{font-size:13px}.bye small{font-size:10px;color:var(--muted)}
-.note{margin-top:16px;background:#fff8ed;border:1px solid #eedcc4;border-radius:12px;padding:11px;color:#765b38;font-size:10px;line-height:1.45}footer{padding:0 0 28px;color:var(--muted);font-size:10px}
-@media(max-width:650px){.container{width:calc(100% - 14px)}.brand img{width:52px;height:52px}.title{font-size:21px}.subtitle{font-size:10px}.top{gap:8px}select{font-size:12px;padding:8px}.match{grid-template-columns:1fr 32px 1fr}.team{flex-direction:column;gap:3px}.team img{width:48px;height:48px}.team strong{font-size:12px}.meta{grid-template-columns:80px 1fr 70px}.meta b{font-size:10px}.time b{font-size:17px}}
-
-.result{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin:3px 0 10px;text-align:center}.result b{font-size:24px;letter-spacing:.5px;order:2}.result span{order:1}
-.result b{font-size:22px}.loss{background:#ffe8e6;color:#b32f2a;padding:4px 8px;border-radius:999px;font-size:9px}
- .tab{display:none}.tab.active{display:block}
-#schedule{display:block}
-main:has(#standings:target) #schedule,
-main:has(#playoffs:target) #schedule{display:none}
-main:has(#standings:target) #standings,
-main:has(#playoffs:target) #playoffs{display:block}
-main:has(#standings:target) #playoffs,
-main:has(#playoffs:target) #standings{display:none}
-.tabs{display:flex;border-top:1px solid #ffffff22}
-.tabs a{flex:1;text-align:center;color:#fff;text-decoration:none;font-size:12px;font-weight:850;padding:10px 3px}
-.tabs a:hover{background:#ffffff12}
-.tab-radio{display:none}
-.tab-radio{display:none}
-.tabs{display:flex;border-top:1px solid #ffffff22}.tabs button{flex:1;background:none;border:0;color:white;padding:10px 3px;font-weight:900;font-size:11px}.tabs button.active{border-bottom:3px solid white}
-.tablebox{background:white;border:1px solid #dce5e5;border-radius:17px;padding:15px;overflow:auto}
-.tablebox table{width:100%;border-collapse:collapse;font-size:12px}.tablebox th,.tablebox td{padding:9px 6px;border-bottom:1px solid #edf1f1;text-align:center}.tablebox th:nth-child(2),.tablebox td:nth-child(2){text-align:left}.mia-row{background:#e8f5f5;font-weight:900;color:#006a72}.team-logo-mini{width:25px;height:25px;vertical-align:middle;margin-right:6px}
-''</style></head><body>
-<header><div class="container"><div class="top"><div class="brand">
-<img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo">
-<div><div class="title">MIAMI DOLPHINS</div><div class="subtitle">SEASON HUB · deutsche Zeit</div></div></div>
-<select><option>Saison 2026</option></select></div>
-<nav class="tabs">
-<a href="#schedule">📅 SPIELPLAN</a>
-<a href="#standings">🏆 TABELLE</a>
-<a href="#playoffs">🏈 PLAYOFFS</a>
-</nav></div></header>
-<main class="container">
-<section id="schedule" class="tab active">
-<section class="summary" id="overview"><h1>📅 SAISON 2026</h1>
-<p><b>Preseason:</b> 13.–29.08.2026 &nbsp;|&nbsp; <b>Regular Season:</b> 13.09.2026–10.01.2027 &nbsp;|&nbsp; Playoffs danach</p>
-<div class="pills"><span class="pill">PRESEASON</span><span class="pill">REGULAR SEASON</span><span class="pill">PLAYOFFS</span><span class="pill">SUPER BOWL</span></div></section>
-<div class="section"><b>PRESEASON</b><span>Vorbereitung</span></div><article class="game"><div class="head"><span class="week">PRE WEEK 1</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/WAS.svg" alt="Washington Commanders Logo"><strong>Washington Commanders</strong><small>WAS</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="result"><b>20 : 7</b><span class="loss">NIEDERLAGE</span></div>
-      <div class="meta"><div><b>14.08.2026</b><small>Freitag</small></div><div><b>🏟️ Northwest Stadium</b><small>📍 Landover, Maryland</small></div><div class="time"><b>01:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">PRE WEEK 2</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/NYG.svg" alt="New York Giants Logo"><strong>New York Giants</strong><small>NYG</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="result"><b>26 : 3</b><span class="loss">NIEDERLAGE</span></div>
-      <div class="meta"><div><b>22.08.2026</b><small>Samstag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>22:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">PRE WEEK 3</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/ATL.svg" alt="Atlanta Falcons Logo"><strong>Atlanta Falcons</strong><small>ATL</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>28.08.2026</b><small>Freitag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>01:00</b><small>deutsche Zeit</small></div></div></article><div class="section"><b>REGULAR SEASON</b><span>Pflichtspiele</span></div><article class="game"><div class="head"><span class="week">WEEK 1</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/LV.svg" alt="Las Vegas Raiders Logo"><strong>Las Vegas Raiders</strong><small>LV</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>13.09.2026</b><small>Sonntag</small></div><div><b>🏟️ Allegiant Stadium</b><small>📍 Las Vegas, Nevada</small></div><div class="time"><b>22:25</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 2</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/SF.svg" alt="San Francisco 49ers Logo"><strong>San Francisco 49ers</strong><small>SF</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>20.09.2026</b><small>Sonntag</small></div><div><b>🏟️ Levi&#x27;s Stadium</b><small>📍 Santa Clara, California</small></div><div class="time"><b>22:25</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 3</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/KC.svg" alt="Kansas City Chiefs Logo"><strong>Kansas City Chiefs</strong><small>KC</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>27.09.2026</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 4</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIN.svg" alt="Minnesota Vikings Logo"><strong>Minnesota Vikings</strong><small>MIN</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>04.10.2026</b><small>Sonntag</small></div><div><b>🏟️ U.S. Bank Stadium</b><small>📍 Minneapolis, Minnesota</small></div><div class="time"><b>22:05</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 5</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/CIN.svg" alt="Cincinnati Bengals Logo"><strong>Cincinnati Bengals</strong><small>CIN</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>11.10.2026</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><div class="bye"><span class="week">WEEK 6</span><div><b>⏸️ BYE WEEK</b><small>18.10.2026 · Sonntag · Miami hat spielfrei</small></div></div><article class="game"><div class="head"><span class="week">WEEK 7</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/NYJ.svg" alt="New York Jets Logo"><strong>New York Jets</strong><small>NYJ</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>25.10.2026</b><small>Sonntag</small></div><div><b>🏟️ MetLife Stadium</b><small>📍 East Rutherford, New Jersey</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 8</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/NE.svg" alt="New England Patriots Logo"><strong>New England Patriots</strong><small>NE</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>01.11.2026</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>22:25</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 9</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/DET.svg" alt="Detroit Lions Logo"><strong>Detroit Lions</strong><small>DET</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>08.11.2026</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 10</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/IND.svg" alt="Indianapolis Colts Logo"><strong>Indianapolis Colts</strong><small>IND</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>15.11.2026</b><small>Sonntag</small></div><div><b>🏟️ Lucas Oil Stadium</b><small>📍 Indianapolis, Indiana</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 11</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/BUF.svg" alt="Buffalo Bills Logo"><strong>Buffalo Bills</strong><small>BUF</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>22.11.2026</b><small>Sonntag</small></div><div><b>🏟️ Highmark Stadium</b><small>📍 Orchard Park, New York</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 12</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/NYJ.svg" alt="New York Jets Logo"><strong>New York Jets</strong><small>NYJ</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>29.11.2026</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 13</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/DEN.svg" alt="Denver Broncos Logo"><strong>Denver Broncos</strong><small>DEN</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>06.12.2026</b><small>Sonntag</small></div><div><b>🏟️ Empower Field at Mile High</b><small>📍 Denver, Colorado</small></div><div class="time"><b>22:05</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 14</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/CHI.svg" alt="Chicago Bears Logo"><strong>Chicago Bears</strong><small>CHI</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>13.12.2026</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 15</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/GB.svg" alt="Green Bay Packers Logo"><strong>Green Bay Packers</strong><small>GB</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>20.12.2026</b><small>Sonntag</small></div><div><b>🏟️ Lambeau Field</b><small>📍 Green Bay, Wisconsin</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 16</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/LAC.svg" alt="Los Angeles Chargers Logo"><strong>Los Angeles Chargers</strong><small>LAC</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>27.12.2026</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 17</span><span class="ha">🏠 HEIMSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/BUF.svg" alt="Buffalo Bills Logo"><strong>Buffalo Bills</strong><small>BUF</small></div><div class="vs">VS</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>03.01.2027</b><small>Sonntag</small></div><div><b>🏟️ Hard Rock Stadium</b><small>📍 Miami Gardens, Florida</small></div><div class="time"><b>19:00</b><small>deutsche Zeit</small></div></div></article><article class="game"><div class="head"><span class="week">WEEK 18</span><span class="ha">✈️ AUSWÄRTSSPIEL</span></div><div class="match"><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/NE.svg" alt="New England Patriots Logo"><strong>New England Patriots</strong><small>NE</small></div><div class="vs">AT</div><div class="team"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div><div class="meta"><div><b>TBD</b><small>TBD</small></div><div><b>🏟️ Gillette Stadium</b><small>📍 Foxborough, Massachusetts</small></div><div class="time"><b>TBD</b><small>noch offen</small></div></div></article>
-<div class="note"><b>🇩🇪 Alle Uhrzeiten sind deutsche Zeit.</b> Der Spielplan entspricht dem aktuell veröffentlichten NFL-Plan; Week 18 ist noch TBD. Die Teamlogos werden direkt von den offiziellen NFL-Logo-Endpunkten geladen.</div>
-</section>
-<section id="standings" class="tab">
-<div class="tablebox"><h1 style="margin-top:0">🏆 Aktuelle Tabelle</h1><p style="color:#6a7b7e;font-size:12px">AFC East · wird beim Öffnen automatisch aktualisiert.</p>
-<table><thead><tr><th>#</th><th>TEAM</th><th>W</th><th>L</th><th>PCT</th></tr></thead><tbody id="standingsBody"><tr><td>–</td><td>Lade aktuelle Tabelle …</td><td>–</td><td>–</td><td>–</td></tr></tbody></table>
-</div></section>
-<section id="playoffs" class="tab">
-<div class="tablebox"><h1 style="margin-top:0">🏈 Playoff Picture</h1><p style="color:#6a7b7e;font-size:12px">Die Dolphins werden anhand der aktuellen AFC-Standings eingeordnet.</p><div id="playoffBox">Lade aktuelle Daten …</div></div>
-</section>
-</main><footer class="container" id="info">Private Miami Dolphins Season Hub · 2026</footer><script>
-async function updateResults(){
-  // Results are always displayed from the opponent's perspective: opponent : Miami.
-  // Do not depend on data-opponent attributes; derive the opponent from the first team logo.
-  const cards = [...document.querySelectorAll(".game")];
-  const byDate = {};
-  cards.forEach(c => {
-    const d = c.querySelector(".meta div b")?.textContent?.trim();
-    const logo = c.querySelector(".match .team:first-child img");
-    const alt = logo?.getAttribute("alt") || "";
-    const opponent = (alt.match(/^(.+?) Logo$/)?.[1] || "").trim();
-    const code = logo?.src?.match(/\/([A-Z]{2,3})\.svg(?:$|[?#])/)?.[1] || "";
-    if (d && /^\d{2}\.\d{2}\.\d{4}$/.test(d) && code && code !== "MIA") {
-      const [dd,mm,yyyy] = d.split(".");
-      (byDate[`${yyyy}${mm}${dd}`] ||= []).push({card:c, opponent:code, opponentName:opponent});
-    }
-  });
-
-  const dates = Object.keys(byDate);
-  for (const date of dates) {
-    try {
-      const r = await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates="+date+"&limit=100");
-      if (!r.ok) continue;
-      const j = await r.json();
-      (j.events || []).forEach(ev => {
-        const comp = ev.competitions?.[0];
-        if (!comp) return;
-        const teams = comp.competitors || [];
-        const mia = teams.find(x => x.team?.abbreviation === "MIA");
-        if (!mia) return;
-        const opp = teams.find(x => x.team?.abbreviation !== "MIA");
-        if (!opp) return;
-        const match = byDate[date]?.find(x => x.opponent === opp.team?.abbreviation);
-        if (!match) return;
-        const card = match.card;
-        const state = comp.status?.type?.state || ev.status?.type?.state;
-        const completed = state === "post" || comp.status?.type?.completed === true || ev.status?.type?.completed === true;
-        if (!completed) return;
-        const miaScore = mia.score != null ? String(mia.score) : "";
-        const oppScore = opp.score != null ? String(opp.score) : "";
-        if (miaScore === "" || oppScore === "") return;
-        const miaWin = Number(miaScore) > Number(oppScore);
-        const label = miaWin ? "SIEG" : "NIEDERLAGE";
-        let box = card.querySelector(".result");
-        if (!box) {
-          box = document.createElement("div");
-          box.className = "result";
-          card.querySelector(".meta").before(box);
-        }
-        box.innerHTML = `<b>${oppScore} : ${miaScore}</b><span class="${miaWin ? "win" : "loss"}">${label}</span>`;
-      });
-    } catch(e) {}
-  }
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#008e97"><link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon.png"><title>Miami Dolphins · Season Hub</title><style>
+:root{--teal:#008e97;--deep:#006a72;--bg:#f2f6f6;--ink:#102629;--muted:#6a7b7e;--line:#dce5e5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:linear-gradient(135deg,#005c64,#008e97,#00a5aa);color:#fff;box-shadow:0 5px 18px #003f4330}.container{width:min(1080px,calc(100% - 24px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 0 10px}.brand{display:flex;align-items:center;gap:11px}.brand img{width:62px;height:62px;object-fit:contain}.title{font-size:25px;font-weight:950}.subtitle{font-size:12px;opacity:.9}.season{position:relative;background:#ffffff18;color:#fff;border:1px solid #ffffff80;border-radius:11px;padding:10px 12px;font-weight:800}.season:after{content:"⌄";position:absolute;right:14px;top:50%;transform:translateY(-55%);pointer-events:none;color:#fff;font-weight:900}.season select{appearance:none;background:transparent;color:#fff;border:0;outline:0;font:inherit;font-weight:800;font-size:inherit;padding-right:18px;cursor:pointer}.season option{color:#102629;background:#fff}
+.nav{display:flex;border-top:1px solid #ffffff25}.nav a{flex:1;text-align:center;color:#fff;text-decoration:none;font-size:12px;font-weight:900;padding:11px 3px}.nav a.active{background:#ffffff16;border-bottom:3px solid #fff}
+main{padding:16px 0 30px}.summary,.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px 16px}.summary h1,.panel h1{margin:0 0 5px;font-size:22px}.summary p,.panel p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.pills{display:flex;gap:7px;overflow:auto;margin-top:12px}.pill{white-space:nowrap;background:#e8f5f5;color:var(--deep);padding:7px 10px;border-radius:999px;font-size:10px;font-weight:900}
+.section{margin:20px 2px 9px;border-bottom:2px solid #d0e0e1;padding:8px 2px;color:var(--deep)}.section b{font-size:18px}.section span{margin-left:7px;color:var(--muted);font-size:11px}.game{background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px 12px;margin:8px 0;box-shadow:0 5px 15px #123b3d0a}.game.next-game{background:#eef9f3;border-color:#b8dfc8;box-shadow:0 5px 18px #18743c18}.game.next-game .week{background:#dff2e7}.head{display:flex;justify-content:space-between;align-items:center}.week{font-size:9px;font-weight:900;background:#eaf4f4;color:var(--deep);padding:5px 8px;border-radius:7px}.ha{font-size:9px;color:var(--deep);font-weight:900}.match{display:grid;grid-template-columns:1fr 38px 1fr;align-items:center;gap:5px;text-align:center;padding:8px 0 5px}.team{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}.team img{width:55px;height:55px;object-fit:contain;flex:none}.team strong{font-size:13px;line-height:1.12}.team small{font-size:9px;color:var(--muted);font-weight:800}.vs{font-size:10px;font-weight:950;color:var(--deep);border:1px solid #cfe0e1;border-radius:999px;padding:6px 4px}.result{display:flex;flex-direction:column;align-items:center;gap:3px;margin:3px 0 10px;text-align:center}.result span{font-size:9px;font-weight:950;padding:4px 8px;border-radius:999px}.result b{font-size:24px;letter-spacing:.5px}.loss{background:#ffe8e6;color:#b32f2a}.win{background:#e4f6ea;color:#18743c}.tie{background:#eef2f2;color:#586a6d}.meta{border-top:1px solid var(--line);padding-top:9px;display:grid;grid-template-columns:130px 1fr 95px;gap:8px;align-items:center}.meta div{display:flex;flex-direction:column;gap:2px}.meta b{font-size:11px;line-height:1.25}.meta small{font-size:9px;color:var(--muted);line-height:1.25}.time{text-align:right}.time b{font-size:19px;color:var(--teal)}
+.loading,.errorbox{padding:30px;text-align:center;color:#6a7b7e;font-size:12px}.note{margin-top:16px;background:#fff8ed;border:1px solid #eedcc4;border-radius:12px;padding:11px;color:#765b38;font-size:10px;line-height:1.45}footer{padding:0 0 28px;color:var(--muted);font-size:10px}.table-scroll{overflow:auto}.standings{width:100%;border-collapse:collapse;font-size:12px}.standings th,.standings td{padding:9px 7px;border-bottom:1px solid #edf1f1;text-align:center}.standings th:nth-child(2),.standings td:nth-child(2){text-align:left}.standings th{font-size:10px;color:var(--muted)}.mia{background:#e8f5f5;color:#006a72;font-weight:900}.teamname{display:flex;align-items:center;gap:7px;white-space:nowrap}.teamname img{width:28px;height:28px;object-fit:contain}.playoff-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:15px}.seed{display:grid;grid-template-columns:30px 1fr 42px;align-items:center;gap:7px;padding:8px;border-bottom:1px solid #edf1f1}.seed img{width:27px;height:27px;object-fit:contain}.seed .rank{font-weight:950;color:#6a7b7e}.seed .record{text-align:right;font-weight:900}.seed.mia{background:#e8f5f5;border-radius:10px;color:#006a72}
+@media(max-width:650px){.container{width:calc(100% - 14px)}.brand img{width:52px;height:52px}.title{font-size:21px}.subtitle{font-size:10px}.top{gap:8px}.season{font-size:12px;padding:8px}.nav a{font-size:10px}.match{grid-template-columns:1fr 32px 1fr}.team{flex-direction:column;gap:3px}.team img{width:48px;height:48px}.team strong{font-size:12px}.meta{grid-template-columns:80px 1fr 70px}.meta b{font-size:10px}.time b{font-size:17px}.playoff-grid{grid-template-columns:1fr}}
+</style></head><body><header><div class="container"><div class="top"><div class="brand"><img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg" alt="Miami Dolphins Logo"><div><div class="title">MIAMI DOLPHINS</div><div class="subtitle">SEASON HUB</div></div></div><div class="season"><select id="seasonSelect" aria-label="Saison auswählen"><option value="2026">Saison 2026</option><option value="2025">Saison 2025</option><option value="2024">Saison 2024</option></select></div></div><nav class="nav"><a class="active" href="index.html">📅 SPIELPLAN</a><a class="" href="tabelle.html">🏆 TABELLE</a><a class="" href="playoffs.html">🏈 PLAYOFFS</a></nav></div></header><main class="container"><section class="summary"><h1>📅 SAISON <span id="yearTitle">2026</span></h1><p id="seasonSummary"></p></section><div id="scheduleBox"><div class="loading">Lade aktuellen NFL-Spielplan …</div></div><div class="note"><b>🔄 Automatisch:</b> Spielplan und Ergebnisse werden beim Öffnen direkt aus aktuellen NFL-Spieldaten geladen.</div><div id="updated" style="margin-top:8px;color:var(--muted);font-size:9px"></div></main><footer class="container">Private Miami Dolphins Season Hub · <span id="footerYear">2026</span></footer><script>
+const API="https://site.api.espn.com/apis/site/v2/sports/football/nfl";
+const MIA_ID="15"; const TZ="Europe/Berlin";
+const TEAM_LOGOS={MIA:"https://static.www.nfl.com/league/api/clubs/logos/MIA.svg",WSH:"https://static.www.nfl.com/league/api/clubs/logos/WSH.svg",NYG:"https://static.www.nfl.com/league/api/clubs/logos/NYG.svg",ATL:"https://static.www.nfl.com/league/api/clubs/logos/ATL.svg",CHI:"https://static.www.nfl.com/league/api/clubs/logos/CHI.svg",DET:"https://static.www.nfl.com/league/api/clubs/logos/DET.svg",BUF:"https://static.www.nfl.com/league/api/clubs/logos/BUF.svg",NE:"https://static.www.nfl.com/league/api/clubs/logos/NE.svg",NYJ:"https://static.www.nfl.com/league/api/clubs/logos/NYJ.svg",BAL:"https://static.www.nfl.com/league/api/clubs/logos/BAL.svg",CIN:"https://static.www.nfl.com/league/api/clubs/logos/CIN.svg",CLE:"https://static.www.nfl.com/league/api/clubs/logos/CLE.svg",PIT:"https://static.www.nfl.com/league/api/clubs/logos/PIT.svg",HOU:"https://static.www.nfl.com/league/api/clubs/logos/HOU.svg",IND:"https://static.www.nfl.com/league/api/clubs/logos/IND.svg",JAX:"https://static.www.nfl.com/league/api/clubs/logos/JAX.svg",TEN:"https://static.www.nfl.com/league/api/clubs/logos/TEN.svg",DEN:"https://static.www.nfl.com/league/api/clubs/logos/DEN.svg",KC:"https://static.www.nfl.com/league/api/clubs/logos/KC.svg",LV:"https://static.www.nfl.com/league/api/clubs/logos/LV.svg",LAC:"https://static.www.nfl.com/league/api/clubs/logos/LAC.svg"};
+function teamLogo(team,abbr){return team?.logos?.[0]?.href || team?.logo || TEAM_LOGOS[abbr] || `https://a.espncdn.com/i/teamlogos/nfl/500/${String(abbr||"").toLowerCase()}.png`;}
+function scoreNumber(v){
+ const vals=[]; if(v!==undefined&&v!==null) vals.push(v); if(v&&typeof v==='object'){for(const k of ['value','displayValue','alternateDisplayValue','score']) if(v[k]!==undefined) vals.push(v[k]);}
+ for(const x of vals){if(typeof x==='number'&&Number.isFinite(x))return x; if(typeof x==='string'&&x.trim()!==''&&/^[-+]?\d+(?:\.\d+)?$/.test(x.trim()))return Number(x);}
+ return null;
 }
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function germanDate(iso){if(!iso)return{date:"TBD",day:"TBD",time:"TBD"};const d=new Date(iso);return{date:new Intl.DateTimeFormat('de-DE',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric'}).format(d),day:new Intl.DateTimeFormat('de-DE',{timeZone:TZ,weekday:'long'}).format(d),time:new Intl.DateTimeFormat('de-DE',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hour12:false}).format(d)}}
+function seasonTypeName(t){return t===1?'PRESEASON':t===2?'REGULAR SEASON':'PLAYOFFS';}
+const SEASON_TEXT={2024:{pre:'27.07.–29.08.2024',reg:'05.09.2024–05.01.2025',post:'11.01.–26.01.2025',sb:'09.02.2025'},2025:{pre:'31.07.–28.08.2025',reg:'05.09.2025–04.01.2026',post:'10.01.–25.01.2026',sb:'08.02.2026'},2026:{pre:'13.–29.08.2026',reg:'13.09.2026–10.01.2027',post:'16.01.–31.01.2027',sb:'14.02.2027'}};
+const params=new URLSearchParams(location.search); let SEASON=Number(params.get('season')||2026); if(![2024,2025,2026].includes(SEASON))SEASON=2026;
+async function fetchScoreboard(season,type){const u=`${API}/teams/${MIA_ID}/schedule?season=${season}&seasontype=${type}`;const res=await fetch(u,{cache:'no-store'});if(!res.ok)throw new Error('NFL API '+res.status);const j=await res.json();return j.events||[];}
+function isMiamiEvent(ev){return ev.competitions?.[0]?.competitors?.some(x=>String(x.team?.id)===MIA_ID||x.team?.abbreviation==='MIA');}
+function eventCard(ev,isNext=false){const c=ev.competitions?.[0],teams=c?.competitors||[];const mia=teams.find(x=>String(x.team?.id)===MIA_ID||x.team?.abbreviation==='MIA');const opp=teams.find(x=>x!==mia);if(!mia||!opp)return'';const home=mia.homeAway==='home';const venue=c.venue?.fullName||'Stadion noch offen';const city=c.venue?.address?.city||c.venue?.city||c.venue?.address?.state||'';const dt=germanDate(ev.date);const ms=scoreNumber(mia.score),os=scoreNumber(opp.score);const completed=c.status?.type?.completed===true||c.status?.type?.state==='post';const done=completed&&ms!==null&&os!==null;let result='';if(done)result=`<div class="result"><span class="${ms>os?'win':ms<os?'loss':'tie'}">${ms>os?'SIEG':ms<os?'NIEDERLAGE':'UNENTSCHIEDEN'}</span><b>${os} : ${ms}</b></div>`;const week=ev.week?.text||(ev.week?.number?`WEEK ${ev.week.number}`:(ev.season?.type===1?'WEEK '+(ev.week?.number||'') :''));return `<article class="game ${isNext?'next-game':''}"><div class="head"><span class="week">${esc(week)}</span><span class="ha">${home?'🏠 HEIMSPIEL':'✈️ AUSWÄRTSSPIEL'}</span></div><div class="match"><div class="team"><img src="${teamLogo(opp.team,opp.team.abbreviation)}" alt="${esc(opp.team.displayName)} Logo"><strong>${esc(opp.team.displayName)}</strong><small>${esc(opp.team.abbreviation)}</small></div><div class="vs">${home?'VS':'AT'}</div><div class="team"><img src="${teamLogo(mia.team,'MIA')}" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div>${result}<div class="meta"><div><b>${dt.date}</b><small>${esc(dt.day)}</small></div><div><b>🏟️ ${esc(venue)}</b><small>📍 ${esc(city)}</small></div><div class="time"><b>${dt.time}</b><small>deutsche Zeit</small></div></div></article>`;}
+async function loadSeasonGames(type){const events=await fetchScoreboard(SEASON,type);return events.filter(isMiamiEvent).sort((a,b)=>new Date(a.date)-new Date(b.date));}
+function setupSeason(){const s=document.getElementById('seasonSelect');if(s){s.value=String(SEASON);s.addEventListener('change',()=>{const u=new URL(location.href);u.searchParams.set('season',s.value);location.href=u.toString();});}document.querySelectorAll('.nav a').forEach(a=>{const u=new URL(a.href,location.href);u.searchParams.set('season',SEASON);a.href=u.toString();});const st=SEASON_TEXT[SEASON];const p=document.getElementById('seasonSummary');if(p){const x=SEASON_TEXT[SEASON];p.innerHTML=`<b>Preseason:</b> ${x.pre} &nbsp;|&nbsp; <b>Regular Season:</b> ${x.reg} &nbsp;|&nbsp; <b>Playoffs:</b> ${x.post} &nbsp;|&nbsp; <b>Super Bowl:</b> ${x.sb}`;}const y=document.getElementById('yearTitle');if(y)y.textContent=SEASON;}
+function recordFromEvents(events){let w=0,l=0,t=0;for(const ev of events){const c=ev.competitions?.[0],ts=c?.competitors||[];const mia=ts.find(x=>String(x.team?.id)===MIA_ID||x.team?.abbreviation==='MIA'),opp=ts.find(x=>x!==mia);if(!mia||!opp)continue;const ms=scoreNumber(mia.score),os=scoreNumber(opp.score);if(ms===null||os===null||!(c.status?.type?.completed||c.status?.type?.state==='post'))continue;if(ms>os)w++;else if(ms<os)l++;else t++;}return{w,l,t,pct:(w+t/2)/(w+l+t||1)};}
 
-async function updateStandings(){
-  const fallback = [
-    {n:"Miami Dolphins",a:"MIA",w:0,l:0,t:0,p:0},
-    {n:"Buffalo Bills",a:"BUF",w:0,l:0,t:0,p:0},
-    {n:"New England Patriots",a:"NE",w:0,l:0,t:0,p:0},
-    {n:"New York Jets",a:"NYJ",w:0,l:0,t:0,p:0}
-  ];
-
-  try{
-    const r = await fetch(
-      "https://site.api.espn.com/apis/site/v2/sports/football/nfl/standings?region=us&lang=en&contentorigin=espn",
-      {cache:"no-store"}
-    );
-    if(!r.ok) throw new Error("Standings request failed");
-    const j = await r.json();
-    let a = [];
-
-    (j.children || []).forEach(c => {
-      (c.standings?.entries || []).forEach(e => {
-        const s = {};
-        (e.stats || []).forEach(x => s[x.name] = x.value);
-        const t = e.team || {};
-        if(["MIA","BUF","NE","NYJ"].includes(t.abbreviation)){
-          a.push({
-            n:t.displayName,
-            a:t.abbreviation,
-            w:Number(s.wins||0),
-            l:Number(s.losses||0),
-            t:Number(s.ties||0),
-            p:Number(s.winPercent||0)
-          });
-        }
-      });
-    });
-
-    if(a.length < 4) a = fallback;
-    a.sort((x,y)=>(y.p-x.p)||(y.w-x.w)||(x.l-y.l));
-    renderStandings(a);
-  }catch(e){
-    renderStandings(fallback);
-  }
-}
-
-function renderStandings(a){
-  document.getElementById("standingsBody").innerHTML = a.map((x,i)=>`
-    <tr class="${x.a==="MIA"?"mia-row":""}">
-      <td>${i+1}</td>
-      <td>${x.n}</td>
-      <td>${x.w}</td>
-      <td>${x.l}</td>
-      <td>${Number(x.p).toFixed(3)}</td>
-    </tr>`).join("");
-
-  const mia = a.find(x=>x.a==="MIA");
-  const regularSeasonStarted = a.some(x => x.w > 0 || x.l > 0 || x.t > 0);
-
-  if(!mia){
-    document.getElementById("playoffBox").innerHTML =
-      '<div style="text-align:center;padding:20px">Keine aktuellen Dolphins-Daten verfügbar.</div>';
-    return;
-  }
-
-  if(!regularSeasonStarted){
-    document.getElementById("playoffBox").innerHTML = `
-      <div style="text-align:center;padding:20px">
-        <img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg"
-             style="width:80px;height:80px">
-        <h2 style="margin:8px 0">Miami Dolphins</h2>
-        <div style="font-size:20px;font-weight:900;color:#008e97">0–0</div>
-        <p style="color:#6a7b7e">Die Regular Season hat noch nicht begonnen.<br>
-        Daher gibt es aktuell noch keine Playoff-Platzierung.</p>
-      </div>`;
-  }else{
-    const rank = a.findIndex(x=>x.a==="MIA")+1;
-    document.getElementById("playoffBox").innerHTML = `
-      <div style="text-align:center;padding:20px">
-        <img src="https://static.www.nfl.com/league/api/clubs/logos/MIA.svg"
-             style="width:80px;height:80px">
-        <h2 style="margin:8px 0">Miami Dolphins</h2>
-        <div style="font-size:28px;font-weight:900;color:#008e97">#${rank} AFC East</div>
-        <p>Aktueller Stand · ${mia.w}-${mia.l}${mia.t ? "-"+mia.t : ""}</p>
-      </div>`;
-  }
-}
-updateResults();
-updateStandings();
-</script></body></html>
+async function loadSchedule(){const box=document.getElementById('scheduleBox');try{const groups={1:await loadSeasonGames(1),2:await loadSeasonGames(2),3:await loadSeasonGames(3)};const all=[...groups[1],...groups[2],...groups[3]];const now=Date.now();const upcoming=all.filter(ev=>{const c=ev.competitions?.[0],type=c?.status?.type;return ev.date&&new Date(ev.date).getTime()>=now&&type?.completed!==true&&type?.state!=='post';}).sort((a,b)=>new Date(a.date)-new Date(b.date));const nextId=upcoming[0]?.id||null;let out='';for(const t of [1,2,3]){if(!groups[t].length)continue;out+=`<div class="section"><b>${seasonTypeName(t)}</b><span>${t===1?'Vorbereitung':t===2?'Pflichtspiele':'Playoffs'}</span></div>`+groups[t].map(ev=>eventCard(ev,ev.id===nextId)).join('');}box.innerHTML=out||'<div class="loading">Für diese Saison sind aktuell keine Dolphins-Spiele verfügbar.</div>';document.getElementById('updated').textContent='Live aktualisiert: '+new Date().toLocaleString('de-DE');}catch(e){console.error(e);box.innerHTML='<div class="errorbox">Die aktuellen NFL-Daten konnten gerade nicht geladen werden. Bitte die Seite einmal neu laden.</div>';}}
+setupSeason();loadSchedule();</script></body></html>

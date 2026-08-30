@@ -26,41 +26,7 @@ async function fetchScoreboard(season,type){const u=`${API}/teams/${MIA_ID}/sche
 function isMiamiEvent(ev){return ev.competitions?.[0]?.competitors?.some(x=>String(x.team?.id)===MIA_ID||x.team?.abbreviation==='MIA');}
 function eventCard(ev){const c=ev.competitions?.[0],teams=c?.competitors||[];const mia=teams.find(x=>String(x.team?.id)===MIA_ID||x.team?.abbreviation==='MIA');const opp=teams.find(x=>x!==mia);if(!mia||!opp)return'';const home=mia.homeAway==='home';const venue=c.venue?.fullName||'Stadion noch offen';const city=c.venue?.address?.city||c.venue?.city||c.venue?.address?.state||'';const dt=germanDate(ev.date);const ms=scoreNumber(mia.score),os=scoreNumber(opp.score);const completed=c.status?.type?.completed===true||c.status?.type?.state==='post';const done=completed&&ms!==null&&os!==null;let result='';if(done)result=`<div class="result"><span class="${ms>os?'win':ms<os?'loss':'tie'}">${ms>os?'SIEG':ms<os?'NIEDERLAGE':'UNENTSCHIEDEN'}</span><b>${ms} : ${os}</b></div>`;const week=ev.week?.text||(ev.week?.number?`WEEK ${ev.week.number}`:(ev.season?.type===1?'WEEK '+(ev.week?.number||'') :''));return `<article class="game"><div class="head"><span class="week">${esc(week)}</span><span class="ha">${home?'🏠 HEIMSPIEL':'✈️ AUSWÄRTSSPIEL'}</span></div><div class="match"><div class="team"><img src="${teamLogo(opp.team,opp.team.abbreviation)}" alt="${esc(opp.team.displayName)} Logo"><strong>${esc(opp.team.displayName)}</strong><small>${esc(opp.team.abbreviation)}</small></div><div class="vs">${home?'VS':'AT'}</div><div class="team"><img src="${teamLogo(mia.team,'MIA')}" alt="Miami Dolphins Logo"><strong>Miami Dolphins</strong><small>MIA</small></div></div>${result}<div class="meta"><div><b>${dt.date}</b><small>${esc(dt.day)}</small></div><div><b>🏟️ ${esc(venue)}</b><small>📍 ${esc(city)}</small></div><div class="time"><b>${dt.time}</b><small>deutsche Zeit</small></div></div></article>`;}
 async function loadSeasonGames(type){const events=await fetchScoreboard(SEASON,type);return events.filter(isMiamiEvent).sort((a,b)=>new Date(a.date)-new Date(b.date));}
-function setupSeason(){const s=document.getElementById('seasonSelect');if(s){s.value=String(SEASON);s.addEventListener('change',()=>{const u=new URL(location.href);u.searchParams.set('season',s.value);location.href=u.toString();});}document.querySelectorAll('.nav a').forEach(a=>{const u=new URL(a.href,location.href);u.searchParams.set('season',SEASON);a.href=u.toString();});const y=document.getElementById('yearTitle');if(y)y.textContent=SEASON;const fy=document.getElementById('footerYear');if(fy)fy.textContent=SEASON;}
+function setupSeason(){const s=document.getElementById('seasonSelect');if(s){s.value=String(SEASON);s.addEventListener('change',()=>{const u=new URL(location.href);u.searchParams.set('season',s.value);location.href=u.toString();});}document.querySelectorAll('.nav a').forEach(a=>{const u=new URL(a.href,location.href);u.searchParams.set('season',SEASON);a.href=u.toString();});const st=SEASON_TEXT[SEASON];const p=document.getElementById('seasonSummary');if(p){const x=SEASON_TEXT[SEASON];p.innerHTML=`<b>Preseason:</b> ${x.pre} &nbsp;|&nbsp; <b>Regular Season:</b> ${x.reg} &nbsp;|&nbsp; <b>Playoffs:</b> ${x.post} &nbsp;|&nbsp; <b>Super Bowl:</b> ${x.sb}`;}const y=document.getElementById('yearTitle');if(y)y.textContent=SEASON;}
 function recordFromEvents(events){let w=0,l=0,t=0;for(const ev of events){const c=ev.competitions?.[0],ts=c?.competitors||[];const mia=ts.find(x=>String(x.team?.id)===MIA_ID||x.team?.abbreviation==='MIA'),opp=ts.find(x=>x!==mia);if(!mia||!opp)continue;const ms=scoreNumber(mia.score),os=scoreNumber(opp.score);if(ms===null||os===null||!(c.status?.type?.completed||c.status?.type?.state==='post'))continue;if(ms>os)w++;else if(ms<os)l++;else t++;}return{w,l,t,pct:(w+t/2)/(w+l+t||1)};}
 
-const TEAM_IDS={BUF:2,MIA:15,NE:17,NYJ:20};
-const NAMES={BUF:'Buffalo Bills',MIA:'Miami Dolphins',NE:'New England Patriots',NYJ:'New York Jets'};
-const HISTORICAL={
-  2024:{
-    BUF:{w:13,l:4,t:0,pct:.765}, MIA:{w:8,l:9,t:0,pct:.471}, NYJ:{w:5,l:12,t:0,pct:.294}, NE:{w:4,l:13,t:0,pct:.235}
-  },
-  2025:{
-    NE:{w:14,l:3,t:0,pct:.824}, BUF:{w:12,l:5,t:0,pct:.706}, MIA:{w:7,l:10,t:0,pct:.412}, NYJ:{w:3,l:14,t:0,pct:.176}
-  }
-};
-function row(x,i){return `<tr class="${x.a==='MIA'?'mia':''}"><td>${i+1}</td><td><div class="teamname"><img src="${teamLogo(null,x.a)}" alt="${esc(x.n)} Logo">${esc(x.n)}</div></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${x.pct.toFixed(3)}</td></tr>`;}
-async function fetchStandings2026(){
-  // 2026 Regular Season has not started yet (23.08.2026). Keep the table at 0-0-0.
-  // Once the Regular Season starts, fetch the official ESPN standings.
-  const seasonStart = new Date('2026-09-13T00:00:00+02:00');
-  if (new Date() < seasonStart) return Object.fromEntries(Object.keys(TEAM_IDS).map(a=>[a,{w:0,l:0,t:0,pct:0}]));
-  const urls=[`${API}/standings?season=2026&seasontype=2`,`https://site.api.espn.com/apis/v2/sports/football/nfl/standings?season=2026&seasontype=2`];
-  for(const u of urls){try{const res=await fetch(u,{cache:'no-store'});if(!res.ok)continue;const j=await res.json();const out={};for(const g of (j.children||[])){if(!/AFC East/i.test(g.name||g.abbreviation||''))continue;for(const e of (g.standings?.entries||[])){const a=e.team?.abbreviation;if(!TEAM_IDS[a])continue;const stats=Object.fromEntries((e.stats||[]).map(z=>[z.name,z.value]));out[a]={w:Number(stats.wins||stats.w||0),l:Number(stats.losses||stats.l||0),t:Number(stats.ties||stats.t||0),pct:Number(stats.winPercent||stats.pct||0)};}}if(Object.keys(out).length===4)return out;}catch(e){console.warn('Standings fetch failed',e)}}
-  return Object.fromEntries(Object.keys(TEAM_IDS).map(a=>[a,{w:0,l:0,t:0,pct:0}]));
-}
-async function loadTable(){
-  const body=document.getElementById('tbody');
-  try{
-    let data;
-    if(HISTORICAL[SEASON]) data=HISTORICAL[SEASON];
-    else data=await fetchStandings2026();
-    const rows=Object.keys(TEAM_IDS).map(a=>({a,n:NAMES[a],...data[a]}))
-      .sort((a,b)=>(b.pct-a.pct)||(b.w-a.w)||(a.l-b.l));
-    body.innerHTML=rows.map(row).join('');
-    const stamp=document.getElementById('stamp');
-    if(SEASON===2026 && rows.every(x=>x.w===0&&x.l===0&&x.t===0)) stamp.textContent='Regular Season noch nicht gestartet';
-    else stamp.textContent=(SEASON<2026?'Abgeschlossene Regular Season':'Live aktualisiert: '+new Date().toLocaleString('de-DE'));
-  }catch(e){console.error(e);body.innerHTML='<tr><td colspan="6">Tabelle konnte gerade nicht geladen werden.</td></tr>';}
-}
-setupSeason();loadTable();</script></body></html>
+const AFC={BUF:2,MIA:15,NE:17,NYJ:20};const NAMES={BUF:'Buffalo Bills',MIA:'Miami Dolphins',NE:'New England Patriots',NYJ:'New York Jets'};function row(x,i){return `<tr class="${x.a==='MIA'?'mia':''}"><td>${i+1}</td><td><div class="teamname"><img src="${teamLogo(null,x.a)}" alt="">${esc(x.n)}</div></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${x.pct.toFixed(3)}</td></tr>`;}async function loadTable(){const body=document.getElementById('tbody');try{const events=await loadSeasonGames(2);const by={};for(const a of Object.keys(AFC))by[a]=[];for(const ev of events){const ts=ev.competitions?.[0]?.competitors||[];for(const a of Object.keys(AFC))if(ts.some(x=>String(x.team?.id)===String(AFC[a])))by[a].push(ev);}const rows=Object.keys(AFC).map(a=>({a,n:NAMES[a],...recordFromEvents(by[a])})).sort((a,b)=>(b.pct-a.pct)||(b.w-a.w)||(a.l-b.l));body.innerHTML=rows.map(row).join('');document.getElementById('stamp').textContent='Live aktualisiert: '+new Date().toLocaleString('de-DE');}catch(e){console.error(e);body.innerHTML='<tr><td colspan="6">Aktuelle Tabelle konnte gerade nicht geladen werden.</td></tr>';}}setupSeason();loadTable();</script></body></html>
