@@ -62,6 +62,27 @@
     if (!data || !Array.isArray(data.events)) throw new Error('Ungültige Spielplandaten');
     return data.events.map(e => normalizeEvent(e, phase)).filter(g => g && (!g.year || g.year === year) && g.phase === phase);
   }
+  function seasonYears(now = new Date()) {
+    return Array.from({ length: 11 }, (_, i) => currentSeason(now) - i);
+  }
+  function scoreboardGames(data, year) {
+    if (!data || !Array.isArray(data.events)) throw new Error('Ungültige Live-Daten');
+    return data.events.map(event => normalizeEvent({ ...event, season: event.season || data.season }))
+      .filter(g => g && g.year === Number(year) && [1, 2, 3].includes(g.phase));
+  }
+  function mergeScoreboard(schedule, updates, stale = false) {
+    const merged = new Map(schedule.map(g => [g.id, g]));
+    for (const update of updates) {
+      const old = merged.get(update.id);
+      // Never replace a confirmed result with an older live/scheduled snapshot.
+      if (old?.complete && !update.complete) continue;
+      if (old?.live && !update.live && !update.complete && !update.suspended && !update.cancelled && !update.postponed) continue;
+      if (stale && old?.hasScores && (old.live || old.complete)) continue;
+      if (!update.hasScores && old?.hasScores && (old.live || old.complete)) continue;
+      merged.set(update.id, { ...old, ...update, weekText: old?.weekText || update.weekText, scoreStale: stale });
+    }
+    return sortGames([...merged.values()]);
+  }
   function sortGames(games) {
     return [...new Map(games.map(g => [g.id, g])).values()].sort((a, b) => (a.stamp ?? Infinity) - (b.stamp ?? Infinity));
   }
@@ -122,5 +143,5 @@
     const seeded = rows.every(r => Number.isInteger(r.seed) && r.seed > 0) && new Set(rows.map(r => r.seed)).size === rows.length;
     return [...rows].sort((a, b) => (seeded ? a.seed - b.seed : b.pct - a.pct) || b.w - a.w || a.team.displayName.localeCompare(b.team.displayName));
   }
-  return { TZ, scoreNumber, currentSeason, normalizeEvent, normalizeSchedule, sortGames, focusGame, record, dateParts, parseStandings, validSeeds, rankRows };
+  return { TZ, scoreNumber, currentSeason, seasonYears, scoreboardGames, mergeScoreboard, normalizeEvent, normalizeSchedule, sortGames, focusGame, record, dateParts, parseStandings, validSeeds, rankRows };
 });

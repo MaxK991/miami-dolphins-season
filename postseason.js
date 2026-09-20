@@ -5,7 +5,7 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (C) {
   'use strict';
   const ROUNDS = [{ week: 1, name: 'Wild Card' }, { week: 2, name: 'Divisional Round' }, { week: 3, name: 'Conference Finals' }, { week: 5, name: 'Super Bowl' }];
-  const AFC = new Set(['BAL', 'BUF', 'CIN', 'CLE', 'DEN', 'HOU', 'IND', 'JAX', 'KC', 'LV', 'LAC', 'MIA', 'NE', 'NYJ', 'PIT', 'TEN']);
+  const AFC = new Set(['BAL', 'BUF', 'CIN', 'CLE', 'DEN', 'HOU', 'IND', 'JAX', 'KC', 'LV', 'OAK', 'SD', 'LAC', 'MIA', 'NE', 'NYJ', 'PIT', 'TEN']);
   const NFC = new Set(['ARI', 'ATL', 'CAR', 'CHI', 'DAL', 'DET', 'GB', 'LAR', 'MIN', 'NO', 'NYG', 'PHI', 'SF', 'SEA', 'TB', 'WSH', 'WAS']);
   function conference(team) {
     const abbreviation = team?.abbreviation;

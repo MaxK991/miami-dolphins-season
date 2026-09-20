@@ -1,4 +1,4 @@
-/* Dolphins Hub v8.3 — GitHub Pages app with an automatically generated calendar feed. */
+/* Dolphins Hub v8.4 — GitHub Pages app with an automatically generated calendar feed. */
 (function () {
   'use strict';
   const C = DolphinsCore;
@@ -61,8 +61,7 @@
     try { return await task; } finally { inFlight.delete(cacheKey); }
   }
   function seasonOptions() {
-    const latest = C.currentSeason();
-    $('seasonSelect').innerHTML = Array.from({ length: Math.max(1, latest - 2024 + 1) }, (_, i) => `<option value="${latest - i}">${latest - i}</option>`).join('');
+    $('seasonSelect').innerHTML = C.seasonYears().map(year => `<option value="${year}">${year}</option>`).join('');
     $('seasonSelect').value = String(season);
     $('footerYear').textContent = new Date().getFullYear();
   }
@@ -114,6 +113,7 @@
     return `<div class="team-row ${index === 0 ? 'miami' : ''}" data-team="${esc(competitor.team.abbreviation)}">${image(competitor.team)}<div class="team-copy"><strong>${esc(competitor.team.displayName)}</strong><small>${esc(competitor.team.abbreviation)} · ${location}</small></div><span class="score ${!show ? 'pending' : ''} ${winner ? 'winner' : ''}" aria-label="${esc(competitor.team.displayName)}: ${show ? game.scores[index] + ' Punkte' : 'noch kein Spielstand'}">${show ? game.scores[index] : '–'}</span></div>`;
   }
   function countdownText(game) {
+    if (game.live && /HALFTIME/i.test(game.statusName)) return 'Halbzeit';
     if (game.live) return `${game.period > 4 ? 'Overtime' : `${game.period}. Viertel`}${game.clock ? ' · ' + game.clock : ''}`;
     if (game.suspended) return 'Spiel unterbrochen';
     if (game.complete) return 'Letztes Spiel dieser Saison';
@@ -135,9 +135,9 @@
     const top = window.scrollY + el.getBoundingClientRect().top - document.querySelector('.app-header').getBoundingClientRect().height - 14;
     window.scrollTo({ top: Math.max(0, top), behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
   }
-  function renderSchedule(data, stale, missing) {
+  function renderSchedule(data, stale, missing, livePacket = null) {
     const previousId = focus?.id;
-    games = C.sortGames(data.flatMap(d => d.games));
+    games = C.mergeScoreboard(data.flatMap(d => d.games), livePacket ? C.scoreboardGames(livePacket.data, season) : [], !!livePacket?.stale);
     focus = C.focusGame(games);
     const record = C.record(games);
     const regularLoaded = data.some(d => d.phase === 2);
@@ -195,12 +195,14 @@
   }
   function conferenceStandings(rows, name, archived) {
     const group = rows.filter(r => r.conference === name);
+    const slots = season >= 2020 ? 7 : 6;
     if (group.length !== 16) return `<section class="panel conference-panel" data-conference="${name}"><h2>${name}</h2><p>Die vollständige ${name}-Tabelle ist gerade nicht verfügbar.</p></section>`;
     const seeded = C.validSeeds(group), sorted = C.rankRows(group), started = group.some(r => r.w + r.l + r.t > 0);
     if (!seeded || !started) return `<section class="panel conference-panel" data-conference="${name}"><h2>${name} · Bilanzübersicht</h2><p>${started ? 'Noch keine verlässliche Setzliste verfügbar.' : 'Vor Saisonbeginn stehen noch keine aussagekräftigen Seeds fest.'}</p>${sorted.map(r => seedRow(r, false, started)).join('')}</section>`;
-    return `<section class="panel conference-panel" data-conference="${name}"><div class="conference-heading"><h2>${name}</h2><span class="conference-tag ${name === 'NFC' ? 'nfc' : ''}">Seeds 1–7</span></div><p>${archived ? 'Qualifikation nach der Regular Season' : 'Aktuelles Playoff-Feld · Momentaufnahme'}</p><div class="playoff-field">${sorted.slice(0, 7).map(r => seedRow(r, true, true)).join('')}</div><details class="outside-field" data-retain="outside-${name}"><summary>Außerhalb · Seeds 8–16</summary>${sorted.slice(7).map(r => seedRow(r, true, true)).join('')}</details></section>`;
+    return `<section class="panel conference-panel" data-conference="${name}"><div class="conference-heading"><h2>${name}</h2><span class="conference-tag ${name === 'NFC' ? 'nfc' : ''}">Seeds 1–${slots}</span></div><p>${archived ? 'Qualifikation nach der Regular Season' : 'Aktuelles Playoff-Feld · Momentaufnahme'}</p><div class="playoff-field">${sorted.slice(0, slots).map(r => seedRow(r, true, true)).join('')}</div><details class="outside-field" data-retain="outside-${name}"><summary>Außerhalb · Seeds ${slots + 1}–16</summary>${sorted.slice(slots).map(r => seedRow(r, true, true)).join('')}</details></section>`;
   }
   function renderPlayoffs(rows, postseason) {
+    const slots = season >= 2020 ? 7 : 6;
     const afc = rows.filter(r => r.conference === 'AFC'), mia = afc.find(r => r.team.abbreviation === 'MIA');
     const started = rows.some(r => r.w + r.l + r.t > 0), archived = season < C.currentSeason();
     const seeded = C.validSeeds(afc), actual = postseason.games;
@@ -212,7 +214,7 @@
     }
     if (mia) {
       const title = !started ? 'Alles noch offen.' : seeded ? 'AFC Seed #' + mia.seed : 'Bilanz ' + recordText(mia);
-      const copy = !started ? 'Das Rennen um die Playoffs beginnt mit der Regular Season.' : !seeded ? 'Noch keine verlässliche Setzliste verfügbar.' : mia.seed <= 7 ? (archived ? 'Miami war für diese Playoffs qualifiziert.' : 'Miami steht aktuell auf einem Playoff-Platz.') : (archived ? 'Miami war in dieser Saison nicht für die Playoffs qualifiziert.' : 'Miami steht aktuell außerhalb der Playoff-Plätze.');
+      const copy = !started ? 'Das Rennen um die Playoffs beginnt mit der Regular Season.' : !seeded ? 'Noch keine verlässliche Setzliste verfügbar.' : mia.seed <= slots ? (archived ? 'Miami war für diese Playoffs qualifiziert.' : 'Miami steht aktuell auf einem Playoff-Platz.') : (archived ? 'Miami war in dieser Saison nicht für die Playoffs qualifiziert.' : 'Miami steht aktuell außerhalb der Playoff-Plätze.');
       miamiCard = `<section class="panel miami-status">${image(mia.team, '')}<span class="eyebrow">Miami Dolphins · ${recordText(mia)}</span><b>${title}</b><p>${copy}</p></section>`;
     }
     let matchups = '', superBowl = '';
@@ -227,7 +229,7 @@
       const roundMarkup = `<details class="post-round" data-retain="round-${round.week}" open><summary><span><strong>${round.name}</strong><small>${description}</small></span><span class="round-count">${roundGames.length ? roundGames.length + (roundGames.length === 1 ? ' Spiel' : ' Spiele') : 'Daten fehlen'}</span></summary><div class="post-games-grid">${roundGames.map(g => postseasonCard(g, postseason.stale)).join('') || '<div class="empty"><p>Diese Runde konnte gerade nicht geladen werden.</p></div>'}</div></details>`;
       if (round.week === 5) superBowl = roundMarkup; else matchups += roundMarkup;
     }
-    const seeds = `<details class="seeds-section" data-retain="seeds" ${archived && actual.length ? '' : 'open'}><summary><span><strong>AFC & NFC · Setzlisten</strong><small>${archived ? 'Stand nach der Regular Season' : 'Aktueller Stand der Regular Season'}</small></span></summary><div class="playoff-columns">${['AFC', 'NFC'].map(name => conferenceStandings(rows, name, archived)).join('')}</div><p class="table-note">Seeds 1–4: Division-Sieger · Seeds 5–7: Wild Cards. Seed 1 jeder Conference hat in der Wild Card Round spielfrei. Die Seeds werden aus ESPN übernommen, einschließlich der dort berücksichtigten Tiebreaker.</p></details>`;
+    const seeds = `<details class="seeds-section" data-retain="seeds" ${archived && actual.length ? '' : 'open'}><summary><span><strong>AFC & NFC · Setzlisten</strong><small>${archived ? 'Stand nach der Regular Season' : 'Aktueller Stand der Regular Season'}</small></span></summary><div class="playoff-columns">${['AFC', 'NFC'].map(name => conferenceStandings(rows, name, archived)).join('')}</div><p class="table-note">Seeds 1–4: Division-Sieger · Seeds 5–${slots}: Wild Cards. ${slots === 7 ? 'Seed 1 jeder Conference hat' : 'Seeds 1 und 2 jeder Conference haben'} in der Wild Card Round spielfrei. Die Seeds werden aus ESPN übernommen, einschließlich der dort berücksichtigten Tiebreaker.</p></details>`;
     $('content').innerHTML = `<section class="section-hero"><p class="eyebrow">Season ${season} · AFC & NFC</p><h1>Der ganze Weg.<br>Bis zum Super Bowl.</h1><p>Alle Playoff-Runden, Spielorte und Sieger.<br>Saison ${season} · Postseason ${season + 1}</p></section>${championCard}${superBowl}${miamiCard}<section class="postseason-matchups" aria-label="Playoff-Spiele"><div class="schedule-intro"><h2>Spiele & Ergebnisse</h2><span class="small-label">${actual.length} Begegnungen<br>Deutsche Anstoßzeiten</span></div>${matchups}</section>${seeds}`;
   }
   async function load(options = {}) {
@@ -251,16 +253,22 @@
     updateChrome();
     try {
       if (requestedPage === 'schedule') {
-        const responses = await Promise.allSettled([1, 2, 3].map(async phase => {
+        const requests = [1, 2, 3].map(async phase => {
           const packet = await resource(`schedule:${requestedSeason}:${phase}`, `${API}/teams/15/schedule?season=${requestedSeason}&seasontype=${phase}`, data => C.normalizeSchedule(data, requestedSeason, phase));
           return { ...packet, phase, games: C.normalizeSchedule(packet.data, requestedSeason, phase), bye: packet.data.byeWeek };
-        }));
+        });
+        // The season schedule omits scores during games; scoreboard supplies live scores and clock.
+        const current = requestedSeason === C.currentSeason();
+        if (current) requests.push(resource(`live:${requestedSeason}`, `${API}/scoreboard?limit=100`, data => C.scoreboardGames(data, requestedSeason)));
+        const responses = await Promise.allSettled(requests);
         if (token !== pending) return;
-        const ok = responses.filter(r => r.status === 'fulfilled').map(r => r.value);
-        const missing = responses.flatMap((r, i) => r.status === 'rejected' ? [phaseNames[i + 1]] : []);
-        if (!ok.length) throw new Error('Spielplandaten nicht erreichbar');
-        const stale = status(ok, missing);
-        renderSchedule(ok, stale, missing);
+        const ok = responses.slice(0, 3).filter(r => r.status === 'fulfilled').map(r => r.value);
+        const missing = responses.slice(0, 3).flatMap((r, i) => r.status === 'rejected' ? [phaseNames[i + 1]] : []);
+        const livePacket = responses[3]?.status === 'fulfilled' ? responses[3].value : null;
+        if (current && !livePacket) missing.push('Live-Spielstände');
+        if (!ok.length && !livePacket) throw new Error('Spielplandaten nicht erreichbar');
+        const stale = status([...ok, ...(livePacket ? [livePacket] : [])], missing);
+        renderSchedule(ok, stale, missing, livePacket);
       } else if (requestedPage === 'playoffs') {
         const results = await Promise.allSettled([
           resource(`standings:${requestedSeason}`, `${TABLE_API}?season=${requestedSeason}&type=0&level=3`, data => C.parseStandings(data, requestedSeason)),
