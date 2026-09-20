@@ -1,96 +1,73 @@
-# Prüfübersicht · Dolphins Hub v8.2
+# Prüfübersicht · Dolphins Hub v8.3
 
 Stand: 20.09.2026
 
-## Gefundene und korrigierte Fehler
+## Ergebnis
 
-1. **Punktzahlen vertauscht dargestellt:** Bisher erschien links das gegnerische Team, darunter links aber Miamis Punktzahl. Jetzt besitzt jede Teamzeile ihre eigene Punktzahl, bestimmt durch Team-ID 15 beziehungsweise Kürzel MIA, unabhängig von Heimrecht und API-Reihenfolge.
-2. **Jahreszahl fest einprogrammiert:** Bisher wurden nur 2024 bis 2026 unterstützt und 2026 war der feste Standard. Jetzt werden aktuelle Saison und Auswahl dynamisch berechnet.
-3. **Laufende Spiele übersprungen:** Bisher musste die Anstoßzeit in der Zukunft liegen, damit ein Spiel als aktuell ausgewählt wurde. Jetzt haben laufende Spiele Vorrang; ein gerade erfolgter Anstoß bleibt bei verzögertem Status-Update berücksichtigt.
-4. **Kein automatischer Sprung zum aktuellen Spiel:** Jetzt wird die ausgewählte Karte beim Öffnen unterhalb des festen Kopfbereichs sichtbar. Manuelles Scrollen während des Ladens wird respektiert.
-5. **Falsche Tabellen und Playoff-Platzierungen:** Bisher basierten Bilanzen sämtlicher AFC-Teams nur auf Begegnungen der Dolphins, aus Dolphins-Perspektive. Jetzt werden die vollständigen Tabellendaten und gelieferten Seeds verwendet.
-6. **Fehlende robuste Fehlerbehandlung:** Teilfehler und gespeicherte Daten werden sichtbar gekennzeichnet. Fehlende Daten werden nicht als 0:0 oder erfundene Platzierungen ausgegeben.
+**45 automatisierte Tests erfolgreich:** 12 Tests für Spielplan-/Tabellenlogik, 18 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests und 6 Playoff-Datentests.
 
-## Erfolgreiche automatisierte Tests
+Zusätzlich wurde die vollständige Kalendererzeugung mit frisch direkt von ESPN geladenen Daten ausgeführt: 20 Dolphins-Spiele der Saison 2026, davon **19 mit bestätigter Anstoßzeit** im Kalender. Week 18 gegen New England hat noch keine bestätigte Anstoßzeit und wird daher noch nicht als Kalendertermin angelegt.
 
-### Datenlogik (12 Tests)
+Der Probelauf wurde ausdrücklich als lokal gekennzeichnet (`automatic: false`). Er wird nicht als aktiviertes Kalenderabo ausgegeben. Erst der eingerichtete GitHub-Ablauf veröffentlicht Kalender und Status mit `automatic: true`.
 
-- Miamis 6:9-Niederlage für beide Heimrechte und beide Reihenfolgen der API-Teams.
-- Unterschiedliche Punkteformate, Siege, Unentschieden, echte Nullpunkte und fehlende Werte.
-- Ausschluss von Preseason und Playoffs aus der Regular-Season-Bilanz.
-- Aktuelles Saisonjahr, Januar/Februar und Jahresfortschreibung ab März.
-- Vorrang eines laufenden Spiels vor späteren Spielen.
-- Spiel-Fokus unmittelbar nach Anstoß bei noch verzögertem API-Status.
-- Weiterspringen nach Spielende, Umgang mit abgesagten/verschobenen Spielen und abgeschlossenen Saisons.
-- Filterung nach Saison/Phase und Entfernung doppelter Ereignisse.
-- Deutsche Zeiten, Mitternacht, Sommer-/Winterzeit, unbestätigte Termine.
-- Vollständige 2025er Bilanzen und Seeds aller AFC-Teams aus echten ESPN-Daten.
-- Erkennung fehlender oder doppelter Playoff-Seeds.
-- Verarbeitung echter 2026er Spielplan- und Tabellendaten.
+## Neue Kalenderfunktion
 
-### DOM-Integration (10 Tests)
+- Wiederholtes Laden unveränderter Daten erzeugt keine zusätzlichen Termine und erhöht die Ereignisversion nicht.
+- Eine verlegte Anstoßzeit behält die Ereignis-ID und erhöht `SEQUENCE`; der bestehende Termin lässt sich dadurch aktualisieren.
+- Zusätzliche Spiele erscheinen als neue Termine.
+- Bereits abonnierte, danach unbestimmt verschobene Termine werden als entfallen gekennzeichnet; bei bestätigter Neuansetzung wird dieselbe ID reaktiviert.
+- Neue Termine ohne bestätigte Anstoßzeit werden ausgelassen.
+- Historische abonnierte Termine bleiben erhalten. Entfallene zukünftige Termine werden gekennzeichnet.
+- Der Saisonwechsel 2026 → 2027 ist mit Testdaten geprüft: der Abo-Link bleibt gleich, historische Einträge bleiben bestehen, veröffentlichte neue Saisonspiele kommen hinzu.
+- UTC-Zeiten, geschätzte Endzeit, Text-Escaping, CRLF-Zeilenenden und Zeilenfaltung mit maximal 75 UTF-8-Bytes geprüft.
+- Keine fest erzwungene Kalenderfarbe und keine automatisch hinzugefügten Erinnerungsalarme.
+- Projektpfade unter GitHub Pages bleiben im HTTPS-/webcal-Link erhalten; eine Archiv-Jahresauswahl verändert den Link nicht.
+- Einmalige Importaktionen und der Kalenderbutton an der Spielkarte sind entfernt.
+- Der Abo-Button ist nur unter Spielplan sichtbar. Das Abo funktioniert unabhängig davon, ob die Website gerade ESPN-Daten abrufen kann.
+- Fehlender oder als nicht automatisch bereitgestellt gekennzeichneter Kalender aktiviert keinen Abo-Link.
+- Ein Kalenderstand älter als drei Tage löst einen sichtbaren Hinweis im geöffneten Dialog aus.
 
-Die Integrationstests verwenden eine DOM-Simulation mit kontrollierter Uhrzeit und aufgezeichneten ESPN-Antworten. Sie sind keine Tests in einem Browser mit Layout-Engine.
+## Bereitstellung
 
-- Neues Öffnen trotz alter Saison-URL: aktuelle Saison, 20 Spielkarten, eine aktuelle Karte und automatischer Scroll-Aufruf.
-- Archiv-Saisonauswahl und interne Navigation; frischer Seitenaufruf setzt die Saison zurück.
-- Vollständige AFC-Seeds, alle 16 Teams und sieben Teams im aktuellen Playoff-Feld.
-- Aktualisierung ohne Zurückspringen; gespeicherte Werte bei Netzfehler sichtbar markiert.
-- Komplettausfall ohne Fantasiedaten, mit Erneut-versuchen-Button.
-- Teilfehler: verfügbare Spiele bleiben sichtbar, fehlende Phase wird ausgewiesen.
-- Fehlende Seeds: Bilanzübersicht statt erfundener Playoff-Plätze.
-- Wiederherstellung aus dem Browser-Zwischenspeicher setzt die aktuelle Saison und das Spiel zurück.
+- Die Kalendererzeugung lädt den zuletzt veröffentlichten Ereignisstatus zur Erhaltung von IDs, Erstellungszeiten und Versionsnummern.
+- HTTP-Fehler, unplausible Saisonantworten und plötzlich leere zuvor vorhandene Spielplanabschnitte brechen die Bereitstellung ab.
+- Geprüft: Bei simuliertem Ausfall wird eine vorhandene Kalenderdatei nicht überschrieben.
+- Die Veröffentlichung in GitHub Actions hängt vom erfolgreichen Build ab. Die Website wird direkt als Pages-Artefakt veröffentlicht, ohne Bot-Commits als indirekten Auslöser.
+- YAML-Struktur, Zeitplan, Standardbranch und Abhängigkeit des Deploy-Jobs geprüft.
+- Die Website-Ausgabe enthält nur die vorgesehenen öffentlichen Dateien. Build-Skripte werden nicht in die Website-Ausgabe kopiert.
+- Die benötigte `.nojekyll`-Datei wird automatisch erzeugt; der Finder muss keine versteckten Dateien hochladen.
+- GitHub kann geplante Abläufe nach 60 Tagen ohne Repository-Aktivität deaktivieren. Diese Grenze und die Reaktivierung sind in `ABO_EINRICHTEN.md` dokumentiert.
 
-## Weitere Prüfungen
+## Playoffs und neue Reihenfolge
 
-- JavaScript-Syntax von `app.js` und `core.js` geprüft.
-- Spielplan und Tabelle direkt über die ESPN-Endpunkte erfolgreich abgerufen.
-- Tabellen-Endpunkt antwortet mit HTTP 200 und `Access-Control-Allow-Origin: *` auf einen Abruf mit GitHub-Pages-Origin; direkter Abruf aus einer statischen Website ist damit zum Prüfzeitpunkt grundsätzlich zugelassen.
-- Alle internen Assets werden relativ eingebunden: kompatibel mit GitHub-Pages-Projektpfaden.
-- Existierende Einstiegsseiten und 180×180-Pixel-App-Icon bleiben erhalten.
+- Der Champion steht oben; **direkt danach folgt das Super-Bowl-Feld**, genau einmal.
+- Danach folgen Miami-Status sowie Wild Card, Divisional Round und Conference Finals; AFC-/NFC-Setzlisten bleiben enthalten.
+- Historische ESPN-Daten für 2024 und 2025 enthalten jeweils 13 Begegnungen: 6 Wild Cards, 4 Divisional Games, 2 Conference Finals und 1 Super Bowl.
+- Team-Punkte bleiben auch bei vertauschter API-Reihenfolge richtig zugeordnet.
+- Datum, deutsche Uhrzeit, Stadion, Sieger und korrekte Zuordnung der Playoffs zum Saisonjahr geprüft.
+- Keine Siegerbehauptung während laufender oder noch nicht gestarteter Spiele.
+- TBD-Platzhalter, Pro Bowl, falsche Saison/Runde und Duplikate werden ausgeschlossen.
+- Fehlende Tabelle unterdrückt verfügbare Begegnungen nicht; eine fehlende Runde unterdrückt die übrigen Runden nicht.
+
+## Bisherige Funktionen weiterhin geprüft
+
+- Miamis 6:9-Niederlage wird unabhängig von Heimrecht und API-Teamreihenfolge korrekt zugeordnet.
+- Unterschiedliche Punkteformate, echte Nullpunkte, Unentschieden und fehlende Ergebnisse.
+- Regular-Season-Bilanz schließt Preseason und Playoffs aus.
+- Aktuelle Saison dynamisch; Januar/Februar gehören noch zur vorangegangenen NFL-Saison.
+- Laufendes beziehungsweise nächstes Spiel wird ausgewählt; gerade erfolgter Anstoß bleibt bei verspäteten Quelldaten berücksichtigt.
+- Beim Öffnen/Neuladen auch aus Tabelle und Playoffs: Spielplan, aktuelle Saison und Scroll-Aufruf zum aktuellen Spiel.
+- Archivwahl bleibt während interner Navigation erhalten; eine neue Sitzung setzt sie zurück.
+- Deutsche Zeitzone inklusive Sommer-/Winterzeit und Datumswechsel nach Mitternacht.
+- Vollständige AFC-/NFC-Tabellen und gelieferte Seeds, keine erfundenen Tiebreaker.
+- Netzfehler und gespeicherte Daten werden sichtbar gekennzeichnet; keine Fantasie-Spielstände.
 
 ## Nicht verifiziert
 
-- Optische Darstellung, tatsächliche Scrollposition und Touch-Bedienung auf einem echten iPhone/Safari.
-- Vollständiger Browser-Klicktest: Die Browser-Sicherheitsrichtlinie dieser Umgebung sperrt lokale Vorschauen.
-- Tatsächlicher Kalenderimport in iOS und Installation auf dem Home-Bildschirm.
-- Zukünftige Stabilität der öffentlichen ESPN-Schnittstelle.
+- Echte optische Darstellung, tatsächliche Scrollposition und Touch-Bedienung auf einem iPhone/Safari.
+- Vollständiger Browser-Klicktest: Die Browser-Sicherheitsrichtlinie dieser Umgebung blockiert lokale Vorschauen. Die DOM-Tests besitzen keine Layout-Engine.
+- Ausführung des neuen Workflows im GitHub-Konto des Nutzers und dessen tatsächliches Pages-Deployment.
+- Abonnieren und spätere Aktualisierungsintervalle in der iPhone-Kalender-App.
+- Dauerhafte Verfügbarkeit und unveränderte Struktur der öffentlichen ESPN-Schnittstellen.
 
-Die mobile Darstellung wurde im CSS für kleine Bildschirme, Safe Areas und größere Touch-Flächen implementiert, aber nicht als visuell geprüft ausgegeben.
-
-## Ergänzung v8.1
-
-- Neuladen von Tabelle und Playoffs wird mit zuvor ausgewählter Archiv-Saison getestet: URL, aktive Navigation, Saison und Scroll-Aufruf zeigen danach den aktuellen Spielplan.
-- Wiederherstellung einer Archiv-Playoff-Seite aus dem Browser-Zwischenspeicher führt ebenfalls zum aktuellen Spielplan.
-- 22 automatisierte Tests erfolgreich; weiterhin keine echte Browser-Sichtprüfung.
-
-
-## Ergänzung v8.2 – 39 Tests erfolgreich
-
-Insgesamt: 12 bisherige Datenlogik-Tests, 16 DOM-Integrationstests, 5 Kalenderformat-Tests und 6 Playoff-Datentests.
-
-### Saisonkalender
-
-- Button ausschließlich im Spielplan vorhanden, in Tabelle/Playoffs ausgeblendet.
-- Kalenderdialog verwendet die ausgewählte Saison und zeigt die Anzahl der Termine.
-- Gesamtexport enthält bestätigte vergangene und zukünftige Spiele. Der Einzelspiel-Button exportiert weiterhin genau ein Spiel.
-- Unbestätigte Uhrzeiten, abgesagte/verschobene/unterbrochene Spiele und Spiele einer anderen Saison werden ausgeschlossen.
-- Stabile Ereignis-IDs, UTC-Zeiten, Kalenderhülle und Zeilenenden geprüft.
-- Textsonderzeichen werden escaped; lange Zeilen werden RFC-5545-konform auf höchstens 75 UTF-8-Bytes gefaltet, ohne mehrbyteige Zeichen zu zerschneiden.
-- Historischer Saisonexport ebenfalls geprüft.
-
-### Playoffs
-
-- Reale ESPN-Spielstände für Saison 2024 und 2025 abgerufen: jeweils 13 Begegnungen, verteilt auf 6 Wild Cards, 4 Divisional Games, 2 Conference Finals und 1 Super Bowl.
-- AFC und NFC haben jeweils sechs Conference-interne Playoff-Spiele; der Super Bowl bleibt ein Spiel zwischen den Conferences.
-- Ergebnis, Sieger, Datum und Stadion beider historischen Super Bowls geprüft, einschließlich korrekter deutscher Datumsverschiebung nach Mitternacht.
-- Team-Punkte bleiben auch bei umgekehrter Reihenfolge in der API korrekt zugeordnet.
-- Keine Siegerbehauptung bei laufenden oder noch nicht gestarteten Spielen.
-- Saison 2026 enthält derzeit TBD-Platzhalter; diese werden nicht als feste Paarungen dargestellt.
-- Alle 32 Teams in den beiden Setzlisten; bestätigte Paarungen werden getrennt dargestellt.
-- Ausfall der Tabelle unterdrückt verfügbare Spiele nicht. Ausfall einer Runde unterdrückt die anderen Runden nicht.
-- Pro Bowl, falsche Saison, falsche Runde und doppelte Ereignisse werden ausgeschlossen.
-
-### Verbleibende Prüfgrenze
-
-Die Tests nutzen echte API-Antworten und DOM-Simulation. Eine visuelle Browser-/Safari-Prüfung sowie ein tatsächlicher iPhone-Kalenderimport wurden nicht durchgeführt. Die bereits dokumentierte Sperre lokaler Browser-Vorschauen bleibt bestehen.
+Die Version ist als Upload-Paket vorbereitet. Die einmalige Aktivierung durch den Nutzer ist in `ABO_EINRICHTEN.md` beschrieben; ein erfolgreicher lokaler Probelauf ersetzt diese Einrichtung nicht.

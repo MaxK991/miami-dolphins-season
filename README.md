@@ -1,37 +1,40 @@
-# Miami Dolphins Season Hub · v8.2
+# Miami Dolphins Season Hub · v8.3
 
-Dein privater Dolphins-Hub, optimiert für die Nutzung auf dem iPhone.
-Statische Website für GitHub Pages – ohne Installation, Build oder API-Schlüssel.
+Dein privater Dolphins-Hub für iPhone und GitHub Pages.
 
-## Bei GitHub aktualisieren
+## Neu in dieser Version
 
-1. ZIP entpacken.
-2. Im bisherigen GitHub-Repository den Ordner öffnen, in dem deine `index.html` liegt (je nach Einrichtung im Hauptordner oder unter `docs`).
-3. **Alle entpackten Dateien und Ordner** dort hochladen und bestehende Dateien ersetzen. Nicht die ZIP-Datei selbst hochladen. Insbesondere `app.js`, `core.js`, `calendar.js`, `postseason.js` und `styles.css` müssen neben der `index.html` liegen.
-4. Änderungen mit **Commit changes** speichern. Die bisherige GitHub-Pages-Einstellung kann bestehen bleiben.
-5. Nach dem abgeschlossenen Pages-Deployment deine Website neu öffnen. Unten steht **v8.2**. Falls noch die alte Version zu sehen ist, die Seite einmal neu laden.
+- **Ein echtes Kalenderabo:** Ein fester Link, neue Spiele und Terminänderungen werden automatisch bereitgestellt. Das Abo läuft saisonübergreifend weiter. Deine Kalenderfarbe wählst du auf dem iPhone.
+- **Nur ein Kalenderbutton:** „Dolphins-Kalender abonnieren“ oben unter Spielplan. Der Kalenderbutton am einzelnen Spiel wurde entfernt.
+- **Super Bowl weiter oben:** Das vollständige Super-Bowl-Feld steht direkt unter dem Champion.
+- Die bisherigen Verbesserungen an Punkten, aktuellem Spiel, Neuladen, AFC-/NFC-Playoffs und Tabellen bleiben erhalten.
 
-Die Adressen `index.html`, `tabelle.html` und `playoffs.html` bleiben erhalten.
-Es werden keine Daten zu einem eigenen Server übertragen; die Website lädt öffentliche ESPN-Daten und Teamlogos.
+## Bei GitHub einrichten
 
-## Neu in v8.2: Saisonkalender und vollständige Playoffs
+**Für das Kalenderabo ist zusätzlich zum Datei-Upload eine einmalige GitHub-Actions-Einrichtung nötig.** Die vollständige Anleitung steht in [ABO_EINRICHTEN.md](ABO_EINRICHTEN.md).
 
-### Saisonkalender – ausschließlich unter Spielplan
+1. Alle entpackten Dateien einschließlich `automation` ins Hauptverzeichnis des bisherigen Repositorys hochladen und gleichnamige Dateien ersetzen. Das Repository vorher nicht leeren.
+2. Settings → Pages → Source auf **GitHub Actions** stellen.
+3. Die mitgelieferte Workflow-Vorlage `automation/dolphins-hub.yml` als `.github/workflows/dolphins-hub.yml` im Branch `main` speichern.
+4. Unter Actions den Ablauf **Dolphins Hub und Kalenderabo** prüfen beziehungsweise einmal starten. Wenn build und deploy grün sind, ist das Abo bereit.
+5. Auf der Website unter Spielplan das Kalenderabo öffnen und einmal auf dem iPhone bestätigen.
 
-Oben im festen Kopfbereich gibt es **„Saison in den Kalender“**. Der Button bleibt sichtbar, auch wenn automatisch zum aktuellen Spiel gescrollt wird. In Tabelle und Playoffs ist er ausgeblendet.
+Der Abruf ist alle sechs Stunden geplant. GitHub kann solche Zeitpläne nach **60 Tagen ohne Repository-Aktivität** deaktivieren; dann ist eine Reaktivierung unter Actions nötig. Der Abo-Dialog zeigt den Kalenderstand und warnt ab drei Tagen ohne Aktualisierung. Die Kalender-App bestimmt ihren eigenen Abrufrhythmus. Ausführliche Hinweise, Fehlerhilfe und Quellen stehen in der Anleitung.
 
-Der Button öffnet einen kleinen Kalenderdialog mit der Anzahl bestätigter Spieltermine. **„Kalenderdatei öffnen“** erzeugt eine `.ics`-Datei mit allen verfügbaren terminierten Dolphins-Spielen der ausgewählten Saison, inklusive vergangener Spiele, Preseason und bereits feststehender Dolphins-Playoff-Spiele. Noch unbestätigte Anstoßzeiten und abgesagte, verschobene oder unterbrochene Spiele werden nicht mit einer erfundenen Uhrzeit exportiert. Fehlende Daten oder ein gespeicherter Datenstand werden im Dialog kenntlich gemacht.
+Die Website und öffentliche Kalenderdatei bleiben unter deiner GitHub-Pages-Adresse. Es ist kein eigenes Backend, Zugangsschlüssel oder zusätzliches Konto erforderlich. GitHub Actions erzeugt die Kalenderdatei und veröffentlicht die Website direkt als Pages-Artefakt. Bei fehlerhaften Quelldaten wird nicht veröffentlicht; der letzte erfolgreiche Stand bleibt erhalten.
 
-Auf Geräten mit Unterstützung für das Teilen dieser Datei erscheint zusätzlich **„Datei teilen“**. Der Kalenderimport selbst muss anschließend auf dem Gerät bestätigt werden. Abhängig von iOS und der öffnenden App kann zunächst eine Vorschau beziehungsweise ein Download erscheinen. Dann lässt sich die Datei über das Teilen-Menü an eine unterstützte Kalender-App oder als Mail-Anhang weitergeben. Der konkrete iPhone-Import konnte hier nicht am Gerät überprüft werden.
+## Kalenderabo
 
-Es handelt sich um einen **einmaligen Import**, nicht um ein Kalenderabo: nachträgliche Terminänderungen werden nicht automatisch übernommen. Erneutes Importieren kann doppelte Einträge erzeugen. Die Endzeit ist auf 3,5 Stunden geschätzt. Die vorhandene Einzelspiel-Kalenderfunktion bleibt erhalten. Einzel- und Gesamtexport verwenden dieselben stabilen Ereignis-IDs.
+Der Abo-Button ist ausschließlich im Spielplan sichtbar. Er ist unabhängig von der ausgewählten Archiv-Saison. Beim ersten Einrichten enthält das Abo die aktuelle NFL-Saison; künftige Saisons kommen hinzu, zuvor abonnierte Termine bleiben bestehen. Unbestätigte Anstoßzeiten werden nicht erfunden. Pro Spiel wird eine stabile Ereignis-ID verwendet, Änderungen erhöhen dessen Versionsnummer.
+
+Bereits einmalig importierte Termine werden durch das Abo nicht gelöscht. Diese bei Bedarf manuell entfernen, damit keine doppelten Einträge sichtbar sind. Die Abo-Termine sind schreibgeschützt; die Farbe wird in der Kalender-App gewählt. Die Endzeit ist weiterhin auf 3,5 Stunden geschätzt.
 
 ### Playoffs – AFC, NFC und tatsächlich gespielte Begegnungen
 
 - Beide Conferences haben eigene Setzlisten mit Seeds 1–7 und aufklappbaren Plätzen 8–16.
 - Zusätzlich werden die tatsächlichen Playoff-Begegnungen nach Wild Card, Divisional Round, Conference Finals und Super Bowl angezeigt.
 - Jede Begegnung enthält Teams, korrekt zugeordnete Punkte, Datum, deutsche Anstoßzeit, Stadion, Stadt und – nach bestätigtem Spielende – den Sieger.
-- Der bestätigte Super-Bowl-Sieger erscheint oben als Champion.
+- Der bestätigte Super-Bowl-Sieger erscheint oben als Champion. Direkt darunter steht das Super-Bowl-Feld mit Teams, Ergebnis, Datum und Spielort; die übrigen Runden folgen weiter unten.
 - Die Saisonauswahl gilt auch für die Playoff-Historie. **Saison 2025** zeigt beispielsweise die Playoffs im Januar/Februar **2026**.
 - Aktuelle Paarungen und Ergebnisse werden nach Veröffentlichung automatisch geladen. Platzhalter wie „TBD gegen TBD“ werden nicht als feststehende Begegnungen ausgegeben.
 - Die Setzlisten und tatsächlichen Playoff-Spiele werden getrennt dargestellt. Ein aktueller Seed ist während der Regular Season noch keine feste Playoff-Qualifikation.
@@ -54,14 +57,13 @@ Jedes neue Öffnen und Neuladen startet jetzt auf **Spielplan → aktuelle Saiso
 - Automatische Aktualisierung: während eines laufenden Dolphins-Spiels alle 30 Sekunden, sonst alle zwei Minuten, solange die Seite sichtbar ist. Bei Rückkehr in die Seite wird erneut geladen. Der Button oben löst zusätzlich eine manuelle Aktualisierung aus.
 - Automatische Updates reißen dich beim Lesen nicht zurück zum aktuellen Spiel. Dafür gibt es den Button **Aktuelles Spiel**.
 - Anstoßzeiten werden in **Europe/Berlin** dargestellt, inklusive Sommer-/Winterzeit und Datumswechsel nach Mitternacht. Unbestätigte Uhrzeiten erscheinen als „Offen“.
-- Ein **Kalender**-Button am nächsten terminierten Spiel lädt eine `.ics`-Datei. Nachträgliche Spielplanänderungen werden in einem einmal importierten Kalendereintrag nicht automatisch geändert; die Endzeit ist geschätzt.
 - Bei Abrufproblemen können zuletzt erfolgreich geladene Daten angezeigt werden. Sie werden ausdrücklich als gespeicherter Stand gekennzeichnet. Es gibt keine erfundenen Ersatzwerte.
 
 ## Korrektur von Tabelle und Playoffs
 
 Die alte Version leitete sogar die Bilanzen anderer Teams nur aus Miami-Spielen ab und zählte dabei aus Miamis Perspektive. Das war keine belastbare NFL-Tabelle.
 
-Version 8.2 verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
+Version 8.3 verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
 
 ## Auf dem iPhone
 
@@ -79,10 +81,6 @@ Das vorhandene Dolphins-App-Icon bleibt erhalten. Die Website benötigt zum erst
 
 ## Prüfung
 
-39 automatisierte Daten- und DOM-Integrationstests erfolgreich. Die Tests prüfen unter anderem Zuordnung der Punkte, Sieg/Niederlage, Saisonauswahl, Spiel-Fokus, Archivnavigation, Tabellen, Seeds und gespeicherte Daten bei Ausfällen.
+Automatisierte Tests prüfen Datenlogik, Kalenderaktualisierungen, Termin-IDs, Fehlerfälle, DOM-Integration und die neue Super-Bowl-Reihenfolge. Details und die Grenzen der Prüfung stehen in [PRUEFUNG.md](PRUEFUNG.md).
 
-Echte ESPN-Antworten für die Saisons 2025 und 2026 wurden geprüft. **Eine visuelle Prüfung in einem echten iPhone/Safari oder im Testbrowser konnte in dieser Umgebung nicht durchgeführt werden:** Der verfügbare Testbrowser blockiert lokale Vorschauen. DOM-Tests ersetzen diesen Sichttest nicht.
-
-Die detaillierte Prüfübersicht steht in `PRUEFUNG.md`.
-
-Technische Referenz des Kalenderformats: [iCalendar / RFC 5545](https://www.rfc-editor.org/rfc/rfc5545). Hinweise von Apple zu Kalendern und ICS-Abonnements: [iPhone-Kalender](https://support.apple.com/en-euro/guide/iphone/iph3d1110d4/ios). Dieser Hub erzeugt Importdateien und stellt keinen Abo-Endpunkt bereit.
+Eine echte Safari-/iPhone-Sichtprüfung, ein Live-Deployment des neuen Workflows und das tatsächliche Kalenderabo auf dem Gerät wurden hier nicht durchgeführt.
