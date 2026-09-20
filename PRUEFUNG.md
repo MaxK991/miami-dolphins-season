@@ -1,4 +1,4 @@
-# Prüfübersicht · Dolphins Hub v8
+# Prüfübersicht · Dolphins Hub v8.1
 
 Stand: 20.09.2026
 
@@ -28,7 +28,7 @@ Stand: 20.09.2026
 - Erkennung fehlender oder doppelter Playoff-Seeds.
 - Verarbeitung echter 2026er Spielplan- und Tabellendaten.
 
-### DOM-Integration (8 Tests)
+### DOM-Integration (10 Tests)
 
 Die Integrationstests verwenden eine DOM-Simulation mit kontrollierter Uhrzeit und aufgezeichneten ESPN-Antworten. Sie sind keine Tests in einem Browser mit Layout-Engine.
 
@@ -57,3 +57,9 @@ Die Integrationstests verwenden eine DOM-Simulation mit kontrollierter Uhrzeit u
 - Zukünftige Stabilität der öffentlichen ESPN-Schnittstelle.
 
 Die mobile Darstellung wurde im CSS für kleine Bildschirme, Safe Areas und größere Touch-Flächen implementiert, aber nicht als visuell geprüft ausgegeben.
+
+## Ergänzung v8.1
+
+- Neuladen von Tabelle und Playoffs wird mit zuvor ausgewählter Archiv-Saison getestet: URL, aktive Navigation, Saison und Scroll-Aufruf zeigen danach den aktuellen Spielplan.
+- Wiederherstellung einer Archiv-Playoff-Seite aus dem Browser-Zwischenspeicher führt ebenfalls zum aktuellen Spielplan.
+- 22 automatisierte Tests erfolgreich; weiterhin keine echte Browser-Sichtprüfung.

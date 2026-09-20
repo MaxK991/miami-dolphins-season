@@ -1,4 +1,4 @@
-/* Dolphins Hub v8 — static GitHub Pages app, no build step or credentials. */
+/* Dolphins Hub v8.1 — static GitHub Pages app, no build step or credentials. */
 (function () {
   'use strict';
   const C = DolphinsCore;
@@ -16,7 +16,8 @@
   function image(team, cls = 'team-logo') {
     return `<img class="${cls}" src="${logo(team)}" alt="" width="40" height="40" loading="lazy">`;
   }
-  let season = C.currentSeason(), page = document.body.dataset.page || 'schedule';
+  // Every fresh load starts at the current game, including table/playoff URLs.
+  let season = C.currentSeason(), page = 'schedule';
   let games = [], focus = null, pending = 0, timer = null, countdownTimer = null;
   let lastHidden = 0, userMoved = false, toastTimer;
   let loadedSeasonYear = C.currentSeason();
@@ -281,6 +282,7 @@
   });
   function returnToApp(reset) {
     if (reset || loadedSeasonYear !== C.currentSeason()) {
+      page = 'schedule';
       season = C.currentSeason(); loadedSeasonYear = season; seasonOptions();
       history.replaceState({ page, season }, '', pages[page][0]);
     }
@@ -295,6 +297,6 @@
   window.addEventListener('pagehide', () => { clearTimeout(timer); clearInterval(countdownTimer); });
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   // Intentionally ignore saved years and old ?season= bookmarks on a new visit.
-  history.replaceState({ page, season }, '', location.pathname);
+  history.replaceState({ page, season }, '', pages.schedule[0]);
   seasonOptions(); load({ jump: page === 'schedule' });
 })();

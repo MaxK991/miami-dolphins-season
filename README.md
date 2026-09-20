@@ -1,4 +1,4 @@
-# Miami Dolphins Season Hub · v8
+# Miami Dolphins Season Hub · v8.1
 
 Dein privater Dolphins-Hub, optimiert für die Nutzung auf dem iPhone.
 Statische Website für GitHub Pages – ohne Installation, Build oder API-Schlüssel.
@@ -9,10 +9,14 @@ Statische Website für GitHub Pages – ohne Installation, Build oder API-Schlü
 2. Im bisherigen GitHub-Repository den Ordner öffnen, in dem deine `index.html` liegt (je nach Einrichtung im Hauptordner oder unter `docs`).
 3. **Alle entpackten Dateien und Ordner** dort hochladen und bestehende Dateien ersetzen. Nicht die ZIP-Datei selbst hochladen. Insbesondere `app.js`, `core.js` und `styles.css` müssen neben der `index.html` liegen.
 4. Änderungen mit **Commit changes** speichern. Die bisherige GitHub-Pages-Einstellung kann bestehen bleiben.
-5. Nach dem abgeschlossenen Pages-Deployment deine Website neu öffnen. Unten steht **v8**. Falls noch die alte Version zu sehen ist, die Seite einmal neu laden.
+5. Nach dem abgeschlossenen Pages-Deployment deine Website neu öffnen. Unten steht **v8.1**. Falls noch die alte Version zu sehen ist, die Seite einmal neu laden.
 
 Die Adressen `index.html`, `tabelle.html` und `playoffs.html` bleiben erhalten.
 Es werden keine Daten zu einem eigenen Server übertragen; die Website lädt öffentliche ESPN-Daten und Teamlogos.
+
+## Korrektur in v8.1
+
+Jedes neue Öffnen und Neuladen startet jetzt auf **Spielplan → aktuelle Saison → aktuelles Spiel**, auch wenn vorher Tabelle oder Playoffs geöffnet waren. Auch die URL wird auf `index.html` zurückgesetzt. Die Navigation zu Tabelle und Playoffs funktioniert während der Nutzung weiterhin normal. Die Rückkehr aus dem Browser-Zwischenspeicher oder nach mehr als einer Minute im Hintergrund führt ebenfalls zum aktuellen Spielplan.
 
 ## Was neu ist
 
@@ -34,7 +38,7 @@ Es werden keine Daten zu einem eigenen Server übertragen; die Website lädt öf
 
 Die alte Version leitete sogar die Bilanzen anderer Teams nur aus Miami-Spielen ab und zählte dabei aus Miamis Perspektive. Das war keine belastbare NFL-Tabelle.
 
-Version 8 verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
+Version 8.1 verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
 
 ## Auf dem iPhone
 
@@ -51,7 +55,7 @@ Das vorhandene Dolphins-App-Icon bleibt erhalten. Die Website benötigt zum erst
 
 ## Prüfung
 
-20 automatisierte Daten- und DOM-Integrationstests erfolgreich. Die Tests prüfen unter anderem Zuordnung der Punkte, Sieg/Niederlage, Saisonauswahl, Spiel-Fokus, Archivnavigation, Tabellen, Seeds und gespeicherte Daten bei Ausfällen.
+22 automatisierte Daten- und DOM-Integrationstests erfolgreich. Die Tests prüfen unter anderem Zuordnung der Punkte, Sieg/Niederlage, Saisonauswahl, Spiel-Fokus, Archivnavigation, Tabellen, Seeds und gespeicherte Daten bei Ausfällen.
 
 Echte ESPN-Antworten für die Saisons 2025 und 2026 wurden geprüft. **Eine visuelle Prüfung in einem echten iPhone/Safari oder im Testbrowser konnte in dieser Umgebung nicht durchgeführt werden:** Der verfügbare Testbrowser blockiert lokale Vorschauen. DOM-Tests ersetzen diesen Sichttest nicht.
 
