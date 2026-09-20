@@ -1,4 +1,4 @@
-# Miami Dolphins Season Hub · v8.1
+# Miami Dolphins Season Hub · v8.2
 
 Dein privater Dolphins-Hub, optimiert für die Nutzung auf dem iPhone.
 Statische Website für GitHub Pages – ohne Installation, Build oder API-Schlüssel.
@@ -7,12 +7,35 @@ Statische Website für GitHub Pages – ohne Installation, Build oder API-Schlü
 
 1. ZIP entpacken.
 2. Im bisherigen GitHub-Repository den Ordner öffnen, in dem deine `index.html` liegt (je nach Einrichtung im Hauptordner oder unter `docs`).
-3. **Alle entpackten Dateien und Ordner** dort hochladen und bestehende Dateien ersetzen. Nicht die ZIP-Datei selbst hochladen. Insbesondere `app.js`, `core.js` und `styles.css` müssen neben der `index.html` liegen.
+3. **Alle entpackten Dateien und Ordner** dort hochladen und bestehende Dateien ersetzen. Nicht die ZIP-Datei selbst hochladen. Insbesondere `app.js`, `core.js`, `calendar.js`, `postseason.js` und `styles.css` müssen neben der `index.html` liegen.
 4. Änderungen mit **Commit changes** speichern. Die bisherige GitHub-Pages-Einstellung kann bestehen bleiben.
-5. Nach dem abgeschlossenen Pages-Deployment deine Website neu öffnen. Unten steht **v8.1**. Falls noch die alte Version zu sehen ist, die Seite einmal neu laden.
+5. Nach dem abgeschlossenen Pages-Deployment deine Website neu öffnen. Unten steht **v8.2**. Falls noch die alte Version zu sehen ist, die Seite einmal neu laden.
 
 Die Adressen `index.html`, `tabelle.html` und `playoffs.html` bleiben erhalten.
 Es werden keine Daten zu einem eigenen Server übertragen; die Website lädt öffentliche ESPN-Daten und Teamlogos.
+
+## Neu in v8.2: Saisonkalender und vollständige Playoffs
+
+### Saisonkalender – ausschließlich unter Spielplan
+
+Oben im festen Kopfbereich gibt es **„Saison in den Kalender“**. Der Button bleibt sichtbar, auch wenn automatisch zum aktuellen Spiel gescrollt wird. In Tabelle und Playoffs ist er ausgeblendet.
+
+Der Button öffnet einen kleinen Kalenderdialog mit der Anzahl bestätigter Spieltermine. **„Kalenderdatei öffnen“** erzeugt eine `.ics`-Datei mit allen verfügbaren terminierten Dolphins-Spielen der ausgewählten Saison, inklusive vergangener Spiele, Preseason und bereits feststehender Dolphins-Playoff-Spiele. Noch unbestätigte Anstoßzeiten und abgesagte, verschobene oder unterbrochene Spiele werden nicht mit einer erfundenen Uhrzeit exportiert. Fehlende Daten oder ein gespeicherter Datenstand werden im Dialog kenntlich gemacht.
+
+Auf Geräten mit Unterstützung für das Teilen dieser Datei erscheint zusätzlich **„Datei teilen“**. Der Kalenderimport selbst muss anschließend auf dem Gerät bestätigt werden. Abhängig von iOS und der öffnenden App kann zunächst eine Vorschau beziehungsweise ein Download erscheinen. Dann lässt sich die Datei über das Teilen-Menü an eine unterstützte Kalender-App oder als Mail-Anhang weitergeben. Der konkrete iPhone-Import konnte hier nicht am Gerät überprüft werden.
+
+Es handelt sich um einen **einmaligen Import**, nicht um ein Kalenderabo: nachträgliche Terminänderungen werden nicht automatisch übernommen. Erneutes Importieren kann doppelte Einträge erzeugen. Die Endzeit ist auf 3,5 Stunden geschätzt. Die vorhandene Einzelspiel-Kalenderfunktion bleibt erhalten. Einzel- und Gesamtexport verwenden dieselben stabilen Ereignis-IDs.
+
+### Playoffs – AFC, NFC und tatsächlich gespielte Begegnungen
+
+- Beide Conferences haben eigene Setzlisten mit Seeds 1–7 und aufklappbaren Plätzen 8–16.
+- Zusätzlich werden die tatsächlichen Playoff-Begegnungen nach Wild Card, Divisional Round, Conference Finals und Super Bowl angezeigt.
+- Jede Begegnung enthält Teams, korrekt zugeordnete Punkte, Datum, deutsche Anstoßzeit, Stadion, Stadt und – nach bestätigtem Spielende – den Sieger.
+- Der bestätigte Super-Bowl-Sieger erscheint oben als Champion.
+- Die Saisonauswahl gilt auch für die Playoff-Historie. **Saison 2025** zeigt beispielsweise die Playoffs im Januar/Februar **2026**.
+- Aktuelle Paarungen und Ergebnisse werden nach Veröffentlichung automatisch geladen. Platzhalter wie „TBD gegen TBD“ werden nicht als feststehende Begegnungen ausgegeben.
+- Die Setzlisten und tatsächlichen Playoff-Spiele werden getrennt dargestellt. Ein aktueller Seed ist während der Regular Season noch keine feste Playoff-Qualifikation.
+- Wenn eine Runde oder die Tabelle nicht erreichbar ist, werden die weiterhin verfügbaren Daten angezeigt und die fehlenden Bereiche benannt.
 
 ## Korrektur in v8.1
 
@@ -38,7 +61,7 @@ Jedes neue Öffnen und Neuladen startet jetzt auf **Spielplan → aktuelle Saiso
 
 Die alte Version leitete sogar die Bilanzen anderer Teams nur aus Miami-Spielen ab und zählte dabei aus Miamis Perspektive. Das war keine belastbare NFL-Tabelle.
 
-Version 8.1 verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
+Version 8.2 verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
 
 ## Auf dem iPhone
 
@@ -49,14 +72,17 @@ Das vorhandene Dolphins-App-Icon bleibt erhalten. Die Website benötigt zum erst
 
 - Spielplan: ESPN Team Schedule API, Miami-Team-ID 15; Preseason, Regular Season und Playoffs getrennt.
 - Tabelle und Seeds: ESPN NFL Standings API, ausgewähltes Saisonjahr, Regular Season.
+- Playoff-Begegnungen: ESPN NFL Scoreboard API mit Saisonjahr, `seasontype=3` und Runden 1, 2, 3 und 5; keine Pro-Bowl-Spiele.
 - Logos: ESPN; vorhandenes lokales Dolphins-Icon für App und Kopfbereich.
 - Die öffentlichen Schnittstellen sind keine garantierte offizielle API. Verzögerungen, kurzfristige Ausfälle, CORS-Änderungen oder Strukturänderungen können Anpassungen erfordern. „Live“ beschreibt den Spielstatus der Datenquelle, keine sekundengenaue Übertragung.
 - Keine Wettquoten, Konten, Tracker oder Zugangsschlüssel.
 
 ## Prüfung
 
-22 automatisierte Daten- und DOM-Integrationstests erfolgreich. Die Tests prüfen unter anderem Zuordnung der Punkte, Sieg/Niederlage, Saisonauswahl, Spiel-Fokus, Archivnavigation, Tabellen, Seeds und gespeicherte Daten bei Ausfällen.
+39 automatisierte Daten- und DOM-Integrationstests erfolgreich. Die Tests prüfen unter anderem Zuordnung der Punkte, Sieg/Niederlage, Saisonauswahl, Spiel-Fokus, Archivnavigation, Tabellen, Seeds und gespeicherte Daten bei Ausfällen.
 
 Echte ESPN-Antworten für die Saisons 2025 und 2026 wurden geprüft. **Eine visuelle Prüfung in einem echten iPhone/Safari oder im Testbrowser konnte in dieser Umgebung nicht durchgeführt werden:** Der verfügbare Testbrowser blockiert lokale Vorschauen. DOM-Tests ersetzen diesen Sichttest nicht.
 
 Die detaillierte Prüfübersicht steht in `PRUEFUNG.md`.
+
+Technische Referenz des Kalenderformats: [iCalendar / RFC 5545](https://www.rfc-editor.org/rfc/rfc5545). Hinweise von Apple zu Kalendern und ICS-Abonnements: [iPhone-Kalender](https://support.apple.com/en-euro/guide/iphone/iph3d1110d4/ios). Dieser Hub erzeugt Importdateien und stellt keinen Abo-Endpunkt bereit.

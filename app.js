@@ -1,7 +1,9 @@
-/* Dolphins Hub v8.1 — static GitHub Pages app, no build step or credentials. */
+/* Dolphins Hub v8.2 — static GitHub Pages app, no build step or credentials. */
 (function () {
   'use strict';
   const C = DolphinsCore;
+  const Calendar = DolphinsCalendar;
+  const Postseason = DolphinsPostseason;
   const API = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
   const TABLE_API = 'https://site.api.espn.com/apis/v2/sports/football/nfl/standings';
   const pages = { schedule: ['index.html', 'Spielplan'], table: ['tabelle.html', 'Tabelle'], playoffs: ['playoffs.html', 'Playoffs'] };
@@ -21,6 +23,8 @@
   let games = [], focus = null, pending = 0, timer = null, countdownTimer = null;
   let lastHidden = 0, userMoved = false, toastTimer;
   let loadedSeasonYear = C.currentSeason();
+  let scheduleReady = false, scheduleStale = false, scheduleMissing = [];
+  let calendarPayload = null, returnCalendarFocus = null, postseasonLive = false;
   const memory = new Map();
   const inFlight = new Map();
   const hasStorage = (() => { try { localStorage.setItem('dh-probe', '1'); localStorage.removeItem('dh-probe'); return true; } catch { return false; } })();
@@ -75,6 +79,11 @@
       if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     $('jumpButton').hidden = page !== 'schedule' || !focus;
+    const count = Calendar.eligible(games, season).length;
+    $('seasonCalendarButton').hidden = page !== 'schedule';
+    $('seasonCalendarButton').disabled = !scheduleReady || !count;
+    $('seasonCalendarButton').setAttribute('aria-label', `Saison ${season} in den Kalender: ${count} bestätigte Spieltermine`);
+    $('seasonCalendarCount').textContent = scheduleReady ? `${count} Spiele` : 'Lädt …';
   }
   function notice(text) {
     clearTimeout(toastTimer);
@@ -131,6 +140,7 @@
   function renderSchedule(data, stale, missing) {
     const previousId = focus?.id;
     games = C.sortGames(data.flatMap(d => d.games));
+    scheduleReady = true; scheduleStale = stale; scheduleMissing = missing;
     focus = C.focusGame(games);
     const record = C.record(games);
     const regularLoaded = data.some(d => d.phase === 2);
@@ -173,32 +183,69 @@
     const clinch = code === 'z' ? 'Division gewonnen' : code === 'y' ? 'Division gewonnen' : code === 'x' ? 'Playoffs gesichert' : code === 'e' ? 'Ausgeschieden' : code === '*' ? 'Heimrecht gesichert' : '';
     return `<div class="seed-row ${row.team.abbreviation === 'MIA' ? 'mia' : ''}"><span class="seed-num">${seeded && started ? row.seed : '–'}</span>${image(row.team, '')}<span><strong>${esc(row.team.displayName)}</strong><small>${esc(row.division)}${clinch ? ' · ' + clinch : ''}</small></span><b>${recordText(row)}</b></div>`;
   }
-  function renderPlayoffs(rows) {
-    const afc = rows.filter(r => r.conference === 'AFC');
-    if (afc.length !== 16) throw new Error('AFC-Daten unvollständig');
-    const seeded = C.validSeeds(afc), sorted = C.rankRows(afc);
-    const started = afc.some(r => r.w + r.l + r.t > 0), mia = afc.find(r => r.team.abbreviation === 'MIA');
-    const archived = season < C.currentSeason();
-    const statusTitle = !started ? 'Alles noch offen.' : seeded ? 'AFC Seed #' + mia.seed : 'Bilanz ' + recordText(mia);
-    const statusCopy = !started ? 'Mit Beginn der Regular Season startet das Rennen um die Playoffs.' : !seeded ? 'Noch keine verlässliche Setzliste verfügbar. Hier siehst du die vollständigen Bilanzen.' : mia.seed <= 7 ? (archived ? 'Playoff-Platz am Ende der Regular Season.' : 'Aktuell auf einem Playoff-Platz. Die Saison entscheidet.') : (archived ? 'Kein Playoff-Platz am Ende der Regular Season.' : 'Aktuell außerhalb der sieben Playoff-Plätze.');
-    let lists;
-    if (started && seeded) {
-      lists = `<div class="playoff-columns"><section class="panel"><h2>Im Playoff-Feld</h2><p>Seeds 1–7 · AFC</p>${sorted.slice(0, 7).map(r => seedRow(r, true, true)).join('')}<p class="table-note">Seeds 1–4: Division-Sieger · Seeds 5–7: Wild Cards.<br>Seed 1 hat in der ersten Runde spielfrei.</p></section><section class="panel"><h2>Außerhalb</h2><p>Seeds 8–16 · AFC</p><div class="playoff-cut">GRENZE ZU DEN PLAYOFFS</div>${sorted.slice(7).map(r => seedRow(r, true, true)).join('')}</section></div>`;
-    } else {
-      lists = `<section class="panel"><h2>AFC · Bilanzübersicht</h2><p>${started ? 'Ohne bestätigte Seeds wird keine Playoff-Platzierung behauptet.' : 'Vor Saisonbeginn gibt es noch keine aussagekräftige Setzliste.'}</p>${sorted.map(r => seedRow(r, false, started)).join('')}</section>`;
+  function postseasonCard(game, stale) {
+    const dt = C.dateParts(game.date, game.timed);
+    const showScores = game.hasScores && (game.complete || game.live || game.suspended);
+    const label = game.cancelled ? 'ABGESAGT' : game.postponed ? 'VERSCHOBEN' : game.suspended ? 'UNTERBROCHEN' : game.live ? (stale ? 'GESPEICHERTER STAND' : 'LIVE') : game.complete ? 'BEENDET' : 'ANSTEHEND';
+    const rows = game.teams.map((competitor, index) => {
+      const team = competitor.team || { displayName: 'Teilnehmer noch offen', abbreviation: 'TBD' };
+      const winner = game.winner === competitor;
+      const affiliation = Postseason.conference(team);
+      return `<div class="post-team ${winner ? 'post-winner' : ''}" data-team="${esc(team.abbreviation)}">${team.id ? image(team) : '<span class="team-placeholder">?</span>'}<div><strong>${esc(team.displayName)}</strong><small>${affiliation}${game.neutral ? (affiliation ? ' · ' : '') + 'Neutraler Spielort' : (affiliation ? ' · ' : '') + (competitor.homeAway === 'home' ? 'Heim' : 'Auswärts')}</small></div><span class="post-score" aria-label="${esc(team.displayName)}: ${showScores ? game.scores[index] + ' Punkte' : 'noch kein Spielstand'}">${showScores ? game.scores[index] : '–'}</span></div>`;
+    }).join('');
+    const liveDetail = game.live ? `${game.period > 4 ? 'Overtime' : game.period + '. Viertel'}${game.clock ? ' · ' + game.clock : ''}` : '';
+    return `<article class="postgame ${game.week === 5 ? 'superbowl-game' : ''}" id="postgame-${esc(game.id)}"><div class="game-top"><span class="conference-tag ${game.conference === 'NFC' ? 'nfc' : ''}">${esc(game.conference)}</span><span class="badge ${game.live && !stale ? 'live' : ''}">${label}</span></div>${rows}<div class="post-result">${game.winner ? `Sieger: <strong>${esc(game.winner.team.displayName)}</strong>` : game.complete ? 'Sieger oder Ergebnis noch nicht bestätigt.' : liveDetail ? esc(liveDetail) : 'Sieger steht noch nicht fest.'}</div><div class="game-bottom"><div><span class="date">${esc(dt.day)}${dt.day ? ', ' : ''}${esc(dt.date)}</span><small>${game.neutral ? 'Neutraler Spielort' : 'Spielort des Heimteams'}</small></div><div class="post-time"><span class="time">${esc(dt.time)}${dt.time !== 'Offen' ? ' Uhr' : ''}</span><small>Deutsche Zeit</small></div></div><div class="venue">${icon('pin')}<span>${esc(game.venue)}${game.city ? ' · ' + esc(game.city) : ''}</span></div></article>`;
+  }
+  function conferenceStandings(rows, name, archived) {
+    const group = rows.filter(r => r.conference === name);
+    if (group.length !== 16) return `<section class="panel conference-panel" data-conference="${name}"><h2>${name}</h2><p>Die vollständige ${name}-Tabelle ist gerade nicht verfügbar.</p></section>`;
+    const seeded = C.validSeeds(group), sorted = C.rankRows(group), started = group.some(r => r.w + r.l + r.t > 0);
+    if (!seeded || !started) return `<section class="panel conference-panel" data-conference="${name}"><h2>${name} · Bilanzübersicht</h2><p>${started ? 'Noch keine verlässliche Setzliste verfügbar.' : 'Vor Saisonbeginn stehen noch keine aussagekräftigen Seeds fest.'}</p>${sorted.map(r => seedRow(r, false, started)).join('')}</section>`;
+    return `<section class="panel conference-panel" data-conference="${name}"><div class="conference-heading"><h2>${name}</h2><span class="conference-tag ${name === 'NFC' ? 'nfc' : ''}">Seeds 1–7</span></div><p>${archived ? 'Qualifikation nach der Regular Season' : 'Aktuelles Playoff-Feld · Momentaufnahme'}</p><div class="playoff-field">${sorted.slice(0, 7).map(r => seedRow(r, true, true)).join('')}</div><details class="outside-field" data-retain="outside-${name}"><summary>Außerhalb · Seeds 8–16</summary>${sorted.slice(7).map(r => seedRow(r, true, true)).join('')}</details></section>`;
+  }
+  function renderPlayoffs(rows, postseason) {
+    const afc = rows.filter(r => r.conference === 'AFC'), mia = afc.find(r => r.team.abbreviation === 'MIA');
+    const started = rows.some(r => r.w + r.l + r.t > 0), archived = season < C.currentSeason();
+    const seeded = C.validSeeds(afc), actual = postseason.games;
+    const championGame = actual.find(g => g.week === 5 && g.complete && g.winner);
+    let statusCard = '';
+    if (championGame) {
+      const team = championGame.winner.team;
+      statusCard = `<section class="panel champion-card">${image(team, 'champion-logo')}<div><p class="eyebrow">${esc(championGame.headline || 'Super Bowl')} · Sieger</p><h2>${esc(team.displayName)}</h2><p>Champion der Saison ${season}</p></div></section>`;
     }
-    $('content').innerHTML = `<section class="section-hero"><p class="eyebrow">Season ${season} · AFC</p><h1>Road to<br>the Playoffs.</h1><p>${archived ? 'Abschlusstabelle der Regular Season.' : 'So steht Miami im Rennen um die Postseason.'}</p></section><section class="panel miami-status">${image({ abbreviation: 'MIA' }, '')}<span class="eyebrow">Miami Dolphins · ${recordText(mia)}</span><b>${statusTitle}</b><p>${statusCopy}</p></section>${lists}<p class="table-note" style="color:var(--muted);line-height:1.7;padding:4px 0">Seeds werden aus den ESPN-Tabellendaten übernommen, einschließlich der dort berücksichtigten Tiebreaker. Eine Momentaufnahme ist noch keine garantierte Qualifikation.</p>`;
+    if (mia) {
+      const title = !started ? 'Alles noch offen.' : seeded ? 'AFC Seed #' + mia.seed : 'Bilanz ' + recordText(mia);
+      const copy = !started ? 'Das Rennen um die Playoffs beginnt mit der Regular Season.' : !seeded ? 'Noch keine verlässliche Setzliste verfügbar.' : mia.seed <= 7 ? (archived ? 'Miami war für diese Playoffs qualifiziert.' : 'Miami steht aktuell auf einem Playoff-Platz.') : (archived ? 'Miami war in dieser Saison nicht für die Playoffs qualifiziert.' : 'Miami steht aktuell außerhalb der Playoff-Plätze.');
+      statusCard += `<section class="panel miami-status">${image(mia.team, '')}<span class="eyebrow">Miami Dolphins · ${recordText(mia)}</span><b>${title}</b><p>${copy}</p></section>`;
+    }
+    let matchups = '';
+    if (!actual.length) {
+      const unavailable = postseason.missing.length === Postseason.ROUNDS.length;
+      matchups = `<div class="empty"><strong>${unavailable ? 'Playoff-Spiele gerade nicht erreichbar.' : archived ? 'Keine Playoff-Begegnungen verfügbar.' : 'Die Paarungen stehen noch nicht fest.'}</strong><p>${unavailable ? 'Bitte die Daten noch einmal aktualisieren.' : `Die Playoffs der Saison ${season} finden im Kalenderjahr ${season + 1} statt. Sobald die Begegnungen veröffentlicht sind, erscheinen hier Termine, Spielorte und später die Ergebnisse.`}</p></div>`;
+    }
+    for (const round of Postseason.ROUNDS) {
+      const roundGames = actual.filter(g => g.week === round.week);
+      if (!roundGames.length && !postseason.missing.includes(round.week)) continue;
+      const description = round.week === 5 ? 'AFC-Champion gegen NFC-Champion' : round.week === 3 ? 'AFC & NFC Championship Games' : 'AFC & NFC';
+      matchups += `<details class="post-round" data-retain="round-${round.week}" open><summary><span><strong>${round.name}</strong><small>${description}</small></span><span class="round-count">${roundGames.length ? roundGames.length + (roundGames.length === 1 ? ' Spiel' : ' Spiele') : 'Daten fehlen'}</span></summary><div class="post-games-grid">${roundGames.map(g => postseasonCard(g, postseason.stale)).join('') || '<div class="empty"><p>Diese Runde konnte gerade nicht geladen werden.</p></div>'}</div></details>`;
+    }
+    const seeds = `<details class="seeds-section" data-retain="seeds" ${archived && actual.length ? '' : 'open'}><summary><span><strong>AFC & NFC · Setzlisten</strong><small>${archived ? 'Stand nach der Regular Season' : 'Aktueller Stand der Regular Season'}</small></span></summary><div class="playoff-columns">${['AFC', 'NFC'].map(name => conferenceStandings(rows, name, archived)).join('')}</div><p class="table-note">Seeds 1–4: Division-Sieger · Seeds 5–7: Wild Cards. Seed 1 jeder Conference hat in der Wild Card Round spielfrei. Die Seeds werden aus ESPN übernommen, einschließlich der dort berücksichtigten Tiebreaker.</p></details>`;
+    $('content').innerHTML = `<section class="section-hero"><p class="eyebrow">Season ${season} · AFC & NFC</p><h1>Der ganze Weg.<br>Bis zum Super Bowl.</h1><p>Alle Playoff-Runden, Spielorte und Sieger.<br>Saison ${season} · Postseason ${season + 1}</p></section>${statusCard}<section class="postseason-matchups" aria-label="Playoff-Spiele"><div class="schedule-intro"><h2>Spiele & Ergebnisse</h2><span class="small-label">${actual.length} Begegnungen<br>Deutsche Anstoßzeiten</span></div>${matchups}</section>${seeds}`;
   }
   async function load(options = {}) {
     const { jump = false, quiet = false } = options;
     const token = ++pending, requestedSeason = season, requestedPage = page;
     const oldFocus = focus?.id;
+    const retainedDetails = quiet ? [...document.querySelectorAll('details[data-retain]')].map(el => [el.dataset.retain, el.open]) : [];
+    const visiblePostGame = quiet && page === 'playoffs' ? [...document.querySelectorAll('.postgame')].find(el => el.getBoundingClientRect().bottom > document.querySelector('.app-header').getBoundingClientRect().bottom) : null;
+    const postAnchor = visiblePostGame ? { id: visiblePostGame.id, top: visiblePostGame.getBoundingClientRect().top } : null;
     const anchor = quiet ? [...document.querySelectorAll('.game')].find(el => el.getBoundingClientRect().bottom > document.querySelector('.app-header').getBoundingClientRect().bottom) : null;
     const anchorId = anchor?.id, anchorTop = anchor?.getBoundingClientRect().top;
     clearTimeout(timer); clearInterval(countdownTimer);
     $('refreshButton').disabled = true;
     if (!quiet) {
       focus = null; userMoved = false;
+      scheduleReady = false; games = []; postseasonLive = false;
       $('jumpButton').hidden = true;
       $('content').innerHTML = '<p class="loading-text" role="status">Aktuelle NFL-Daten werden geladen …</p><div class="skeleton"></div><div class="skeleton"></div>';
       $('dataStatus').textContent = '';
@@ -216,11 +263,35 @@
         if (!ok.length) throw new Error('Spielplandaten nicht erreichbar');
         const stale = status(ok, missing);
         renderSchedule(ok, stale, missing);
+      } else if (requestedPage === 'playoffs') {
+        const results = await Promise.allSettled([
+          resource(`standings:${requestedSeason}`, `${TABLE_API}?season=${requestedSeason}&type=0&level=3`, data => C.parseStandings(data, requestedSeason)),
+          ...Postseason.ROUNDS.map(round => resource(`postseason:${requestedSeason}:${round.week}`, `${API}/scoreboard?dates=${requestedSeason}&seasontype=3&week=${round.week}`, data => Postseason.parse(data, requestedSeason, round.week)))
+        ]);
+        if (token !== pending) return;
+        const packets = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+        if (!packets.length) throw new Error('Playoff-Daten nicht erreichbar');
+        const rows = results[0].status === 'fulfilled' ? C.parseStandings(results[0].value.data, requestedSeason) : [];
+        const roundGames = [], missing = [], labels = [];
+        if (!rows.length) labels.push('AFC-/NFC-Tabelle');
+        Postseason.ROUNDS.forEach((round, i) => {
+          const result = results[i + 1];
+          if (result.status === 'fulfilled') roundGames.push(...Postseason.parse(result.value.data, requestedSeason, round.week));
+          else { missing.push(round.week); labels.push(round.name); }
+        });
+        const stale = status(packets, labels), actual = Postseason.combine(roundGames);
+        postseasonLive = actual.some(g => g.live);
+        renderPlayoffs(rows, { games: actual, missing, stale });
+        for (const [key, open] of retainedDetails) {
+          const el = [...document.querySelectorAll('details[data-retain]')].find(node => node.dataset.retain === key);
+          if (el) el.open = open;
+        }
+        if (postAnchor && $(postAnchor.id)) window.scrollBy(0, $(postAnchor.id).getBoundingClientRect().top - postAnchor.top);
       } else {
         const packet = await resource(`standings:${requestedSeason}`, `${TABLE_API}?season=${requestedSeason}&type=0&level=3`, data => C.parseStandings(data, requestedSeason));
         if (token !== pending) return;
         const rows = C.parseStandings(packet.data, requestedSeason);
-        if (requestedPage === 'table') renderTable(rows); else renderPlayoffs(rows);
+        renderTable(rows);
         status([packet]);
       }
       if (token !== pending) return;
@@ -238,7 +309,7 @@
     } finally {
       if (token === pending) {
         $('refreshButton').disabled = false;
-        timer = setTimeout(() => { if (!document.hidden) load({ quiet: true }); }, focus?.live ? 30000 : 120000);
+        timer = setTimeout(() => { if (!document.hidden) load({ quiet: true }); }, focus?.live || postseasonLive ? 30000 : 120000);
       }
     }
   }
@@ -249,20 +320,53 @@
     window.scrollTo({ top: 0, behavior: 'auto' });
     seasonOptions(); load({ jump: page === 'schedule' });
   }
-  function calendar(game) {
-    const escapeICS = s => String(s).replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
-    const utc = stamp => new Date(stamp).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dolphins Hub//DE', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT', `UID:dolphins-${game.id}@private-season-hub`, `DTSTAMP:${utc(Date.now())}`, `DTSTART:${utc(game.stamp)}`, `DTEND:${utc(game.stamp + 3.5 * 3600000)}`, `SUMMARY:${escapeICS('Miami Dolphins vs. ' + game.opponent.team.displayName)}`, `LOCATION:${escapeICS(game.venue + (game.city ? ', ' + game.city : ''))}`, 'DESCRIPTION:Anstoßzeit laut ESPN. Änderungen möglich. Die Endzeit ist geschätzt.', 'END:VEVENT', 'END:VCALENDAR'];
-    const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
+  function downloadCalendar(text, filename) {
+    const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob), a = document.createElement('a');
-    a.href = url; a.download = `dolphins-${game.id}.ics`; document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove();
+    // Give iOS enough time to hand the file over to its preview/import sheet.
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+  function calendar(game) {
+    downloadCalendar(Calendar.build([game], season), `dolphins-${game.id}.ics`);
+  }
+  function openSeasonCalendar() {
+    if (!scheduleReady) return;
+    const selected = Calendar.eligible(games, season);
+    if (!selected.length) { notice('Noch keine bestätigten Spieltermine verfügbar.'); return; }
+    const filename = `miami-dolphins-saison-${season}.ics`;
+    const text = Calendar.build(selected, season);
+    const file = typeof File === 'function' ? new File([text], filename, { type: 'text/calendar' }) : null;
+    calendarPayload = { text, filename, file };
+    $('calendarDialogTitle').textContent = `Deine Saison ${season} im Kalender.`;
+    const excluded = games.length - selected.length;
+    $('calendarDialogSummary').textContent = `${selected.length} bestätigte Spieltermine aus Preseason, Regular Season und bereits feststehenden Playoffs – inklusive vergangener Spiele.${excluded ? ` ${excluded} Spiele mit offenem Termin oder unsicherem Spielstatus werden ausgelassen.` : ''} Die Anstoßzeiten werden in der Zeitzone deines Kalenders angezeigt.`;
+    $('calendarCaution').hidden = !scheduleStale;
+    $('calendarCaution').textContent = scheduleMissing.length ? `Der Spielplan ist gerade unvollständig: ${scheduleMissing.join(', ')} fehlen. Der Export enthält nur die geladenen Spiele.` : 'Der Export verwendet einen gespeicherten Datenstand. Bitte prüfe die Termine nach der nächsten Aktualisierung.';
+    let canShare = false;
+    try { canShare = !!(file && typeof navigator !== 'undefined' && navigator.share && navigator.canShare?.({ files: [file] })); } catch { /* Download remains available. */ }
+    $('calendarShare').hidden = !canShare;
+    $('calendarShare').disabled = false;
+    $('calendarFeedback').textContent = '';
+    returnCalendarFocus = document.activeElement;
+    const dialog = $('calendarDialog');
+    if (!dialog.open) {
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+  }
+  function closeSeasonCalendar() {
+    const dialog = $('calendarDialog');
+    if (typeof dialog.close === 'function') dialog.close();
+    else dialog.removeAttribute('open');
+    returnCalendarFocus?.focus();
   }
   document.addEventListener('click', e => {
     const nav = e.target.closest('a[data-page]');
     if (nav && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) { e.preventDefault(); navigate(nav.dataset.page); return; }
     if (e.target.closest('[data-home]')) { e.preventDefault(); navigate('schedule', true); return; }
     if (e.target.closest('[data-retry]')) { load({ jump: page === 'schedule' }); return; }
+    if (e.target.closest('[data-close-calendar]')) { closeSeasonCalendar(); return; }
     const add = e.target.closest('[data-calendar]');
     if (add) { const game = games.find(g => g.id === add.dataset.calendar); if (game) calendar(game); }
   });
@@ -274,6 +378,22 @@
   });
   $('refreshButton').addEventListener('click', () => load({ quiet: true }));
   $('jumpButton').addEventListener('click', () => scrollToFocus(true));
+  $('seasonCalendarButton').addEventListener('click', openSeasonCalendar);
+  $('calendarDownload').addEventListener('click', () => {
+    if (!calendarPayload) return;
+    downloadCalendar(calendarPayload.text, calendarPayload.filename);
+    $('calendarFeedback').textContent = 'Der Kalender-Import muss noch in deiner Kalender-App bestätigt werden.';
+  });
+  $('calendarShare').addEventListener('click', async () => {
+    if (!calendarPayload?.file || typeof navigator === 'undefined' || !navigator.share) return;
+    $('calendarShare').disabled = true;
+    try {
+      await navigator.share({ files: [calendarPayload.file], title: 'Miami Dolphins · Saisonkalender' });
+      $('calendarFeedback').textContent = 'Datei übergeben. Falls noch offen, bestätige den Import in deiner Kalender-App.';
+    } catch (error) {
+      $('calendarFeedback').textContent = error.name === 'AbortError' ? '' : 'Das Teilen hat nicht geklappt. Du kannst die Kalenderdatei weiterhin über den oberen Button öffnen.';
+    } finally { $('calendarShare').disabled = false; }
+  });
   ['touchstart', 'wheel', 'keydown'].forEach(event => window.addEventListener(event, () => { userMoved = true; }, { passive: true }));
   window.addEventListener('popstate', e => {
     season = e.state?.season || C.currentSeason();

@@ -1,4 +1,4 @@
-# Prüfübersicht · Dolphins Hub v8.1
+# Prüfübersicht · Dolphins Hub v8.2
 
 Stand: 20.09.2026
 
@@ -63,3 +63,34 @@ Die mobile Darstellung wurde im CSS für kleine Bildschirme, Safe Areas und grö
 - Neuladen von Tabelle und Playoffs wird mit zuvor ausgewählter Archiv-Saison getestet: URL, aktive Navigation, Saison und Scroll-Aufruf zeigen danach den aktuellen Spielplan.
 - Wiederherstellung einer Archiv-Playoff-Seite aus dem Browser-Zwischenspeicher führt ebenfalls zum aktuellen Spielplan.
 - 22 automatisierte Tests erfolgreich; weiterhin keine echte Browser-Sichtprüfung.
+
+
+## Ergänzung v8.2 – 39 Tests erfolgreich
+
+Insgesamt: 12 bisherige Datenlogik-Tests, 16 DOM-Integrationstests, 5 Kalenderformat-Tests und 6 Playoff-Datentests.
+
+### Saisonkalender
+
+- Button ausschließlich im Spielplan vorhanden, in Tabelle/Playoffs ausgeblendet.
+- Kalenderdialog verwendet die ausgewählte Saison und zeigt die Anzahl der Termine.
+- Gesamtexport enthält bestätigte vergangene und zukünftige Spiele. Der Einzelspiel-Button exportiert weiterhin genau ein Spiel.
+- Unbestätigte Uhrzeiten, abgesagte/verschobene/unterbrochene Spiele und Spiele einer anderen Saison werden ausgeschlossen.
+- Stabile Ereignis-IDs, UTC-Zeiten, Kalenderhülle und Zeilenenden geprüft.
+- Textsonderzeichen werden escaped; lange Zeilen werden RFC-5545-konform auf höchstens 75 UTF-8-Bytes gefaltet, ohne mehrbyteige Zeichen zu zerschneiden.
+- Historischer Saisonexport ebenfalls geprüft.
+
+### Playoffs
+
+- Reale ESPN-Spielstände für Saison 2024 und 2025 abgerufen: jeweils 13 Begegnungen, verteilt auf 6 Wild Cards, 4 Divisional Games, 2 Conference Finals und 1 Super Bowl.
+- AFC und NFC haben jeweils sechs Conference-interne Playoff-Spiele; der Super Bowl bleibt ein Spiel zwischen den Conferences.
+- Ergebnis, Sieger, Datum und Stadion beider historischen Super Bowls geprüft, einschließlich korrekter deutscher Datumsverschiebung nach Mitternacht.
+- Team-Punkte bleiben auch bei umgekehrter Reihenfolge in der API korrekt zugeordnet.
+- Keine Siegerbehauptung bei laufenden oder noch nicht gestarteten Spielen.
+- Saison 2026 enthält derzeit TBD-Platzhalter; diese werden nicht als feste Paarungen dargestellt.
+- Alle 32 Teams in den beiden Setzlisten; bestätigte Paarungen werden getrennt dargestellt.
+- Ausfall der Tabelle unterdrückt verfügbare Spiele nicht. Ausfall einer Runde unterdrückt die anderen Runden nicht.
+- Pro Bowl, falsche Saison, falsche Runde und doppelte Ereignisse werden ausgeschlossen.
+
+### Verbleibende Prüfgrenze
+
+Die Tests nutzen echte API-Antworten und DOM-Simulation. Eine visuelle Browser-/Safari-Prüfung sowie ein tatsächlicher iPhone-Kalenderimport wurden nicht durchgeführt. Die bereits dokumentierte Sperre lokaler Browser-Vorschauen bleibt bestehen.
