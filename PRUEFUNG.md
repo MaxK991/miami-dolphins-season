@@ -1,14 +1,24 @@
-# Prüfübersicht · Dolphins Hub v8.5
+# Prüfübersicht · Dolphins Hub v8.5.1
 
 Stand: 21.09.2026
 
 ## Ergebnis
 
-**69 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 26 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 12 Sender-/Bereitstellungstests.
+**70 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 27 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 12 Sender-/Bereitstellungstests.
 
 Zusätzlich wurde die vollständige Kalendererzeugung mit frisch direkt von ESPN geladenen Daten ausgeführt: 20 Dolphins-Spiele der Saison 2026, davon **19 mit bestätigter Anstoßzeit** im Kalender. Week 18 gegen New England hat noch keine bestätigte Anstoßzeit und wird daher noch nicht als Kalendertermin angelegt.
 
 Der Probelauf wurde ausdrücklich als lokal gekennzeichnet (`automatic: false`). Er wird nicht als aktiviertes Kalenderabo ausgegeben. Erst der eingerichtete GitHub-Ablauf veröffentlicht Kalender und Status mit `automatic: true`.
+
+## Reparatur v8.5.1: Startabbruch bei unvollständiger Veröffentlichung
+
+- Der Fehler wurde an der öffentlich veröffentlichten Website nachgewiesen: `app.js` und HTML v8.5 erreichbar, `broadcasts.js` und `broadcasts-de.json` mit HTTP 404.
+- Der öffentliche Repository-Stand enthielt beide Hauptdateien, aber `automation/build-site.cjs` war noch die ältere Fassung ohne Senderdateien; `automation/broadcast-feed.cjs` fehlte.
+- Aus den veröffentlichten Skripten ließ sich der Startfehler `ReferenceError: DolphinsBroadcasts is not defined` reproduzieren.
+- Das Sendermodul ist für den Browser jetzt optional. Fehlt es, startet der Spielplan mit einem Hinweis auf nicht verfügbare Senderangaben.
+- Ein neuer Regressionstest lässt das komplette Sender-Skript weg und prüft trotzdem Jahresauswahl, 20 Spielkarten, echte Live-Nullpunkte, Scroll-Aufruf, Tabelle, Playoffs und Kalenderabo.
+- HTML-Dateien haben neue Versionsparameter 8.5.1, damit nach dem vollständigen Update die korrigierten Skripte neu geladen werden.
+- Die genaue Reparatur für den beobachteten Repository-Stand steht oben in der README: vier Hauptdateien und zwei Dateien im bestehenden Ordner `automation`.
 
 ## Ergänzung v8.5: Sender in Deutschland
 

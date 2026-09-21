@@ -1,6 +1,19 @@
-# Miami Dolphins Season Hub · v8.5
+# Miami Dolphins Season Hub · v8.5.1
 
 Dein privater Dolphins-Hub für iPhone und GitHub Pages.
+
+## Reparatur, wenn „Deine Dolphins werden geladen …“ stehen bleibt
+
+Version 8.5.1 verhindert, dass eine fehlende Senderdatei den gesamten Spielplan beim Start blockiert. Am 21.09.2026 war im Repository bereits die neue Website vorhanden, der Ordner `automation` jedoch noch auf dem alten Stand. Dadurch fehlte `broadcasts.js` auf der veröffentlichten Website, obwohl die Datei im Repository lag.
+
+Für diesen konkreten Stand reichen **sechs Dateien** aus dem neuen Paket:
+
+1. ZIP entpacken.
+2. GitHub → **Code** → Hauptordner → **Add file → Upload files**. Die vier Dateien `app.js`, `index.html`, `tabelle.html` und `playoffs.html` hochladen und ersetzen. Mit **Commit changes** speichern.
+3. Auf GitHub den vorhandenen Ordner **automation** öffnen → **Add file → Upload files**. Aus dem entpackten Unterordner `automation` die beiden Dateien **`build-site.cjs` und `broadcast-feed.cjs`** gemeinsam hochladen. Mit **Commit changes** speichern.
+4. Unter **Actions → Dolphins Hub und Kalenderabo** den neuesten Lauf abwarten, bis build und deploy grün sind. Danach die Website in Safari neu laden; unten steht **v8.5.1**.
+
+Die Datei `broadcast-feed.cjs` kommt neu hinzu, `build-site.cjs` wird ersetzt. Beide gehören in den bestehenden Unterordner `automation`, nicht in den Hauptordner. Der aktive Workflow unter `.github/workflows` und das Kalenderabo bleiben bestehen. Bei einem vollständigen Update kannst du auch wie bisher alle entpackten Dateien einschließlich des Ordners `automation` hochladen.
 
 ## Neu: Wo läuft das Spiel in Deutschland?
 

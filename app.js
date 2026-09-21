@@ -1,10 +1,10 @@
-/* Dolphins Hub v8.5 — German broadcast listings and an automatic calendar feed. */
+/* Dolphins Hub v8.5.1 — optional TV data must never prevent the schedule from starting. */
 (function () {
   'use strict';
   const C = DolphinsCore;
   const Calendar = DolphinsCalendar;
   const Postseason = DolphinsPostseason;
-  const Broadcasts = DolphinsBroadcasts;
+  const Broadcasts = typeof DolphinsBroadcasts === 'undefined' ? null : DolphinsBroadcasts;
   const API = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
   const TABLE_API = 'https://site.api.espn.com/apis/v2/sports/football/nfl/standings';
   const pages = { schedule: ['index.html', 'Spielplan'], table: ['tabelle.html', 'Tabelle'], playoffs: ['playoffs.html', 'Playoffs'] };
@@ -126,6 +126,7 @@
     return days ? `Kickoff in ${days} T ${hours % 24} Std` : hours ? `Kickoff in ${hours} Std ${mins % 60} Min` : `Kickoff in ${mins} Min`;
   }
   function broadcasts(game) {
+    if (!Broadcasts) return '<section class="game-tv" aria-label="Übertragung in Deutschland"><div class="tv-title"><span>Übertragung</span><small>DEUTSCHLAND</small></div><p class="tv-note">Senderangaben derzeit nicht verfügbar.</p></section>';
     const info = Broadcasts.resolve(game, broadcastPacket?.data, Date.now(), !!broadcastPacket?.stale);
     if (info.hidden) return '';
     const link = (provider, mode = '') => `<a class="tv-provider ${provider.free ? 'tv-free' : 'tv-paid'}" href="${esc(provider.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(provider.name + (mode ? ' · ' + mode : '') + ' · ' + (provider.free ? 'Free-TV' : 'kostenpflichtig') + ' · Anbieter öffnen')}">${esc(provider.name)}<span aria-hidden="true">↗</span></a>`;
@@ -278,7 +279,7 @@
         // The season schedule omits scores during games; scoreboard supplies live scores and clock.
         const current = requestedSeason === C.currentSeason();
         requests.push(current ? resource(`live:${requestedSeason}`, `${API}/scoreboard?limit=100`, data => C.scoreboardGames(data, requestedSeason)) : Promise.resolve(null));
-        requests.push(resource('broadcasts:de', new URL('broadcasts-de.json', location.href).href, Broadcasts.validate));
+        requests.push(Broadcasts ? resource('broadcasts:de', new URL('broadcasts-de.json', location.href).href, Broadcasts.validate) : Promise.resolve(null));
         const responses = await Promise.allSettled(requests);
         if (token !== pending) return;
         const ok = responses.slice(0, 3).filter(r => r.status === 'fulfilled').map(r => r.value);
