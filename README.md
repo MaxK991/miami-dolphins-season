@@ -1,8 +1,49 @@
-# Miami Dolphins Season Hub · v8.3
+# Miami Dolphins Season Hub · v8.5
 
 Dein privater Dolphins-Hub für iPhone und GitHub Pages.
 
-## Neu in dieser Version
+## Neu: Wo läuft das Spiel in Deutschland?
+
+Jede Spielkarte im Spielplan zeigt **Free-TV**, **Pay-TV / Abo** und gegebenenfalls eine getrennte **Konferenz**. Die Anbieter lassen sich antippen. RTL+ ist kostenpflichtig; eine NITRO-Konferenz bedeutet nicht, dass dort das gesamte Dolphins-Spiel einzeln läuft.
+
+- Die deutsche RTL-Wochenauswahl und der Sky-Sendeplan werden im vorhandenen GitHub-Ablauf alle sechs Stunden abgerufen. Team-Paarung, Heimrecht, Datum und Uhrzeit müssen zum Dolphins-Spiel passen.
+- Noch nicht veröffentlichte Free-TV-Sender erscheinen als **„Free-TV noch nicht bestätigt“**. Aus fehlenden Daten wird niemals „nur Pay-TV“ abgeleitet.
+- **NFL Game Pass bei DAZN** erscheint als eigenes kostenpflichtiges Abo für die geprüfte Saison 2026, einschließlich Dolphins-Playoffs. Es wird kein gewöhnliches DAZN-Paket vorausgesetzt. Die allgemeine Game-Pass-Zuordnung muss bei einem späteren Saisonwechsel anhand der dann geltenden Rechte überprüft werden; die RTL-/Sky-Programmsuche läuft weiter automatisch.
+- Konferenzen sind klar als Ausschnitte mehrerer Spiele gekennzeichnet. Programmquellen und Prüfzeitpunkt stehen an bestätigten Senderangaben.
+- Ältere oder nicht vollständig abrufbare Senderdaten werden gekennzeichnet. Der Ausfall einer Programmquelle stoppt weder Spielstände noch Kalenderabo.
+- US-Sender aus ESPN werden nicht als deutsche Empfangsmöglichkeit angezeigt. Historische Spiele erhalten nur gespeicherte damalige Einzelzuordnungen; heutige Anbieter werden nicht pauschal auf die letzten zehn Jahre übertragen.
+
+## Update deiner bereits eingerichteten Version 8.4
+
+**ZIP entpacken. Die entpackten Dateien und den Ordner `automation` wie bisher ins Repository hochladen; gleichnamige Dateien ersetzen. Nicht die ZIP hochladen und das Repository nicht leeren.**
+
+Wenn du nur die technisch benötigten Änderungen hochladen möchtest, sind es diese **neun Dateien**:
+
+| Ziel im Repository | Datei |
+| --- | --- |
+| Hauptordner | `index.html` |
+| Hauptordner | `tabelle.html` |
+| Hauptordner | `playoffs.html` |
+| Hauptordner | `app.js` |
+| Hauptordner | `styles.css` |
+| Hauptordner, neu | `broadcasts.js` |
+| Hauptordner, neu | `broadcasts-de.json` |
+| Ordner `automation`, ersetzen | `build-site.cjs` |
+| Ordner `automation`, neu | `broadcast-feed.cjs` |
+
+Die Dateien aus `automation` müssen in diesem Unterordner bleiben. Auf dem Handy kannst du auf GitHub erst die sieben Hauptdateien hochladen, danach den Ordner `automation` öffnen und dort die beiden Automatikdateien gemeinsam hochladen. Erst nach dem vollständigen Update den neuesten Actions-Lauf prüfen.
+
+Die aktive Datei `.github/workflows/dolphins-hub.yml` bleibt unverändert. GitHub Pages bleibt auf **GitHub Actions**. Dein Kalenderabo behält seinen Link und muss nicht erneut abonniert werden. Nach dem Upload unter **Actions → Dolphins Hub und Kalenderabo** auf einen grünen Durchlauf warten und die Website neu laden. Die beigefügte Senderdatei enthält einen geprüften Anfangsstand; danach erzeugt der Workflow ihre Aktualisierungen selbst.
+
+## Live-Spielstände und Saisonarchiv
+
+- Während laufender Spiele ergänzt das ESPN-Scoreboard die Punkte, Viertel und Uhr. Die Zuordnung erfolgt über Spiel- und Team-ID. Bestätigte Endergebnisse werden nicht durch ältere Live-Werte ersetzt.
+- Zehn vergangene Saisons plus die aktuelle: derzeit 2016–2026, jährlich automatisch fortgeschrieben. Die Auswahl gilt für Spielplan, Tabelle und Playoffs.
+- Historisches Playoff-Format: bis 2019 sechs Teams pro Conference mit zwei Freilosen; ab 2020 sieben Teams mit einem Freilos.
+
+Bei geöffneter, sichtbarer Website werden laufende Spiele alle 30 Sekunden neu abgefragt, sonst alle zwei Minuten. Ein Ausfall der Live-Quelle wird angezeigt; gespeicherte Live-Werte sind als veraltet gekennzeichnet. Die Aktualität hängt zusätzlich von ESPN ab.
+
+## Weiterhin enthalten
 
 - **Ein echtes Kalenderabo:** Ein fester Link, neue Spiele und Terminänderungen werden automatisch bereitgestellt. Das Abo läuft saisonübergreifend weiter. Deine Kalenderfarbe wählst du auf dem iPhone.
 - **Nur ein Kalenderbutton:** „Dolphins-Kalender abonnieren“ oben unter Spielplan. Der Kalenderbutton am einzelnen Spiel wurde entfernt.
@@ -21,7 +62,7 @@ Dein privater Dolphins-Hub für iPhone und GitHub Pages.
 
 Der Abruf ist alle sechs Stunden geplant. GitHub kann solche Zeitpläne nach **60 Tagen ohne Repository-Aktivität** deaktivieren; dann ist eine Reaktivierung unter Actions nötig. Der Abo-Dialog zeigt den Kalenderstand und warnt ab drei Tagen ohne Aktualisierung. Die Kalender-App bestimmt ihren eigenen Abrufrhythmus. Ausführliche Hinweise, Fehlerhilfe und Quellen stehen in der Anleitung.
 
-Die Website und öffentliche Kalenderdatei bleiben unter deiner GitHub-Pages-Adresse. Es ist kein eigenes Backend, Zugangsschlüssel oder zusätzliches Konto erforderlich. GitHub Actions erzeugt die Kalenderdatei und veröffentlicht die Website direkt als Pages-Artefakt. Bei fehlerhaften Quelldaten wird nicht veröffentlicht; der letzte erfolgreiche Stand bleibt erhalten.
+Die Website und öffentliche Kalenderdatei bleiben unter deiner GitHub-Pages-Adresse. Es ist kein eigenes Backend, Zugangsschlüssel oder zusätzliches Konto erforderlich. GitHub Actions erzeugt die Kalenderdatei und veröffentlicht die Website direkt als Pages-Artefakt. Bei fehlerhaften Spielplan- oder Kalenderdaten wird nicht veröffentlicht; der letzte erfolgreiche Stand bleibt erhalten. Senderquellen dürfen unabhängig davon ausfallen: Gespeicherte Angaben behalten ihren alten Prüfzeitpunkt.
 
 ## Kalenderabo
 
@@ -31,7 +72,7 @@ Bereits einmalig importierte Termine werden durch das Abo nicht gelöscht. Diese
 
 ### Playoffs – AFC, NFC und tatsächlich gespielte Begegnungen
 
-- Beide Conferences haben eigene Setzlisten mit Seeds 1–7 und aufklappbaren Plätzen 8–16.
+- Beide Conferences haben eigene Setzlisten mit sechs beziehungsweise sieben Playoff-Plätzen je nach Saison und aufklappbaren übrigen Plätzen.
 - Zusätzlich werden die tatsächlichen Playoff-Begegnungen nach Wild Card, Divisional Round, Conference Finals und Super Bowl angezeigt.
 - Jede Begegnung enthält Teams, korrekt zugeordnete Punkte, Datum, deutsche Anstoßzeit, Stadion, Stadt und – nach bestätigtem Spielende – den Sieger.
 - Der bestätigte Super-Bowl-Sieger erscheint oben als Champion. Direkt darunter steht das Super-Bowl-Feld mit Teams, Ergebnis, Datum und Spielort; die übrigen Runden folgen weiter unten.
@@ -63,7 +104,7 @@ Jedes neue Öffnen und Neuladen startet jetzt auf **Spielplan → aktuelle Saiso
 
 Die alte Version leitete sogar die Bilanzen anderer Teams nur aus Miami-Spielen ab und zählte dabei aus Miamis Perspektive. Das war keine belastbare NFL-Tabelle.
 
-Version 8.3 verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
+Der Hub verwendet die vollständigen Regular-Season-Tabellendaten von ESPN. Die AFC East enthält die jeweiligen Gesamtbilanzen aller vier Teams. Die Playoff-Seeds werden direkt aus dem ESPN-Feld `playoffSeed` übernommen. Sie werden nicht aus einer simplen Sortierung nach Siegen selbst erfunden. Vor Saisonbeginn oder bei fehlenden eindeutigen Seeds wird keine Playoff-Qualifikation behauptet.
 
 ## Auf dem iPhone
 
@@ -71,6 +112,10 @@ In Safari die Website öffnen → **Teilen** → **Zum Home-Bildschirm**.
 Das vorhandene Dolphins-App-Icon bleibt erhalten. Die Website benötigt zum erstmaligen Laden und für aktuelle Daten eine Internetverbindung. Sie ist keine vollständig offlinefähige App.
 
 ## Datenquelle und Grenzen
+
+- Deutsche Einzelspiel-Auswahl: [RTL NFL](https://www.rtl.de/sport/nfl/) und [Sky NFL-Sendeplan](https://www.sky.de/sport/nfl/sendeplan). Aktuell zugeordnete RTL-Übertragungen sind jeweils direkt mit dem Wochenprogramm verknüpft.
+- Game-Pass-Leistungsumfang: [DAZN-Hilfe](https://www.dazn.com/en-GB/help/articles/16310468908957-dazn-and-nfl-game-pass-the-ultimate-football-experience); separates Abonnement, Spiele live und auf Abruf. Aktuelle Deutschland-Verfügbarkeit zusätzlich am 21.09.2026 mit dem [Bericht zum Rechtewechsel](https://www.bild.de/sport/mehr-sport/pay-tv-vertrag-vorzeitig-gekuendigt-dazn-setzt-kuenftig-voll-auf-den-nfl-game-pass-69a583c24ffe244904b6503f) abgeglichen. Keine Preise oder Abopaket-Empfehlung hinterlegt.
+- Die Senderanzeige ist keine vollständige historische TV-Datenbank. Programmänderungen und Änderungen der Quellseiten können zu Lücken führen; dann bleibt die Auswahl offen. Nicht bestätigte Sender und exklusive Verfügbarkeit werden nicht geraten.
 
 - Spielplan: ESPN Team Schedule API, Miami-Team-ID 15; Preseason, Regular Season und Playoffs getrennt.
 - Tabelle und Seeds: ESPN NFL Standings API, ausgewähltes Saisonjahr, Regular Season.

@@ -1,14 +1,45 @@
-# Prüfübersicht · Dolphins Hub v8.3
+# Prüfübersicht · Dolphins Hub v8.5
 
-Stand: 20.09.2026
+Stand: 21.09.2026
 
 ## Ergebnis
 
-**45 automatisierte Tests erfolgreich:** 12 Tests für Spielplan-/Tabellenlogik, 18 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests und 6 Playoff-Datentests.
+**69 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 26 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 12 Sender-/Bereitstellungstests.
 
 Zusätzlich wurde die vollständige Kalendererzeugung mit frisch direkt von ESPN geladenen Daten ausgeführt: 20 Dolphins-Spiele der Saison 2026, davon **19 mit bestätigter Anstoßzeit** im Kalender. Week 18 gegen New England hat noch keine bestätigte Anstoßzeit und wird daher noch nicht als Kalendertermin angelegt.
 
 Der Probelauf wurde ausdrücklich als lokal gekennzeichnet (`automatic: false`). Er wird nicht als aktiviertes Kalenderabo ausgegeben. Erst der eingerichtete GitHub-Ablauf veröffentlicht Kalender und Status mit `automatic: true`.
+
+## Ergänzung v8.5: Sender in Deutschland
+
+Ein kompletter lokaler Build mit frisch abgerufenen ESPN-, RTL- und Sky-Daten war am 21.09.2026 erfolgreich. Beide TV-Quellen wurden erkannt; 19 bestätigte Kalendertermine und die Senderdatei wurden erzeugt. Es wurde dabei nichts im GitHub-Konto veröffentlicht.
+
+- Echte offizielle RTL-/Sky-Programmseiten als Prüfdaten: Dolphins bei den 49ers am 20.09.2026 als RTL-Einzelspiel; NITRO und Sky getrennt als Konferenz. Im Sky-Programm ist außerdem die Konferenz am 27.09.2026 bestätigt, ohne daraus ein Dolphins-Einzelspiel oder eine Free-TV-Auswahl abzuleiten.
+- RTL+ wird als kostenpflichtig erkannt und erzeugt kein zusätzliches kostenloses RTL-Angebot.
+- Beide Teams, Heimrecht, Datum in Deutschland, Jahreskontext und zeitliche Nähe zum Kickoff sind geprüft. Kurzer Vorlauf einer Übertragung ist zulässig; abweichender Kalendertag wird abgewiesen.
+- Nachtspiele werden dem richtigen deutschen Datum zugeordnet. Eine verlegte Anstoßzeit entwertet die alte spezifische Senderzuordnung.
+- Keine Übernahme von FOX/CBS/anderen US-Sendern als deutsche Anbieter.
+- Noch nicht veröffentlichte Free-TV-Auswahl bleibt ausdrücklich unbestätigt; es gibt keine Behauptung „nur Pay-TV“ aus fehlenden Angaben.
+- Historische Spiele und spätere Rechteperioden bekommen keine pauschale heutige Anbieterzuordnung.
+- Fehlerhafte oder undatierte Programmseiten werden nicht als bestätigte Auswahl verwendet.
+- Bei einem Quellenausfall bleiben bisherige Einträge mit unverändertem Prüfzeitpunkt erhalten. Bei künftigen Spielen erscheint ab 72 Stunden beziehungsweise aus dem Offline-Cache ein Hinweis auf ältere Angaben.
+- Eine erfolgreich neu gelesene Programmquelle kann zurückgezogene zukünftige Übertragungen entfernen. Vergangene gespeicherte Übertragungen bleiben erhalten, wenn die Programmseite zur nächsten Woche wechselt.
+- Links sind auf HTTPS und bekannte Programmquellen begrenzt; Darstellung und Inhalte werden maskiert. Externe Links öffnen getrennt mit `noopener noreferrer`.
+- Der Site-Build enthält das neue Browsermodul und die erzeugte Senderdatei. TV-Quellenausfälle verhindern weder Kalendererzeugung noch Bereitstellung.
+- Der bestehende GitHub-Workflow ist unverändert. Neue Senderdaten laufen über denselben geplanten Abruf; ein zusätzliches Konto oder Token ist nicht nötig.
+
+## Ergänzung v8.4: Live-Punkte und zehn Archivjahre
+
+- Der Fehler wurde mit frischen ESPN-Antworten reproduziert: laufendes Miami-Spiel mit Status und Uhr im Saison-Spielplan, aber ohne Punktzahlen; das separate Scoreboard enthält die Punktzahlen.
+- Beide Quellen werden über die Ereignis-ID zusammengeführt; Miamis echte Nullpunkte und gegnerische Punkte bleiben der jeweiligen Team-ID zugeordnet.
+- Live-Uhr, Viertel, 30-Sekunden-Abruf, Punkteänderung ohne Zurückspringen und gespeicherter Live-Stand bei Ausfällen sind getestet.
+- Bestätigte Endergebnisse fallen nicht auf einen älteren Live-Status zurück. Nach Spielende wird das nächste Spiel ausgewählt.
+- Die Auswahl enthält die aktuelle Saison und zehn frühere Saisons; der Jahreswechsel berücksichtigt die NFL-Playoffs im Januar/Februar.
+- Archiv-Saisons rufen keine heutigen Live-Spielstände ab.
+- Alle zehn historischen Saisons 2016–2025 wurden direkt von ESPN geladen und geprüft: Regular-Season-Spielplan, 32 Team-Bilanzen und vier Playoff-Runden je Jahr.
+- Vor 2020: elf Playoff-Begegnungen insgesamt, sechs qualifizierte Teams je Conference, zwei Freilose. Ab 2020: 13 Begegnungen, sieben Teams, ein Freilos.
+- Historische Kürzel OAK und SD werden den AFC-Teams zugeordnet.
+- Die neue DOM-Prüfung für 2016 bestätigt sechs Teams pro Playoff-Feld und den Super Bowl direkt unter dem Champion.
 
 ## Neue Kalenderfunktion
 

@@ -1,9 +1,10 @@
-/* Dolphins Hub v8.4 — GitHub Pages app with an automatically generated calendar feed. */
+/* Dolphins Hub v8.5 — German broadcast listings and an automatic calendar feed. */
 (function () {
   'use strict';
   const C = DolphinsCore;
   const Calendar = DolphinsCalendar;
   const Postseason = DolphinsPostseason;
+  const Broadcasts = DolphinsBroadcasts;
   const API = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
   const TABLE_API = 'https://site.api.espn.com/apis/v2/sports/football/nfl/standings';
   const pages = { schedule: ['index.html', 'Spielplan'], table: ['tabelle.html', 'Tabelle'], playoffs: ['playoffs.html', 'Playoffs'] };
@@ -24,6 +25,7 @@
   let lastHidden = 0, userMoved = false, toastTimer;
   let loadedSeasonYear = C.currentSeason();
   let calendarLinks = null, calendarRequest = 0, returnCalendarFocus = null, postseasonLive = false;
+  let broadcastPacket = null;
   const memory = new Map();
   const inFlight = new Map();
   const hasStorage = (() => { try { localStorage.setItem('dh-probe', '1'); localStorage.removeItem('dh-probe'); return true; } catch { return false; } })();
@@ -123,10 +125,21 @@
     const mins = Math.ceil(delta / 60000), hours = Math.floor(mins / 60), days = Math.floor(hours / 24);
     return days ? `Kickoff in ${days} T ${hours % 24} Std` : hours ? `Kickoff in ${hours} Std ${mins % 60} Min` : `Kickoff in ${mins} Min`;
   }
+  function broadcasts(game) {
+    const info = Broadcasts.resolve(game, broadcastPacket?.data, Date.now(), !!broadcastPacket?.stale);
+    if (info.hidden) return '';
+    const link = (provider, mode = '') => `<a class="tv-provider ${provider.free ? 'tv-free' : 'tv-paid'}" href="${esc(provider.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(provider.name + (mode ? ' · ' + mode : '') + ' · ' + (provider.free ? 'Free-TV' : 'kostenpflichtig') + ' · Anbieter öffnen')}">${esc(provider.name)}<span aria-hidden="true">↗</span></a>`;
+    const free = info.free.length ? info.free.map(p => link(p)).join('') : `<span class="tv-unknown">${esc(info.freeNote)}</span>`;
+    const paid = info.paid.length ? `<div class="tv-row"><span class="tv-kind">PAY-TV / ABO</span><div class="tv-links">${info.paid.map(p => link(p)).join('')}</div></div>` : '';
+    const conference = info.conference.length ? `<div class="tv-conference"><span>In der Konferenz · Ausschnitte aus mehreren Spielen</span><div class="tv-links">${info.conference.map(p => `<div>${link(p, 'Konferenz')}<small>${p.free ? 'Free-TV' : 'Pay-TV'}</small></div>`).join('')}</div></div>` : '';
+    const stamp = info.checkedAt ? new Intl.DateTimeFormat('de-DE', { timeZone: C.TZ, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(info.checkedAt) : '';
+    const sources = info.sources.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.name)}-Programm</a>`).join(' · ');
+    return `<section class="game-tv" aria-label="Übertragung in Deutschland"><div class="tv-title"><span>${info.historic ? 'Übertragung' : 'Hier läuft das Spiel'}</span><small>DEUTSCHLAND</small></div><div class="tv-row"><span class="tv-kind">FREE-TV</span><div class="tv-links">${free}</div></div>${paid}${info.gamepass ? '<p class="tv-note">Game Pass: separates Abo bei DAZN · US-Originalkommentar.</p>' : ''}${conference}${stamp ? `<p class="tv-source ${info.stale ? 'tv-stale' : ''}">${info.stale ? 'Ältere Senderangabe · bitte beim Anbieter prüfen. ' : ''}Programm geprüft: ${esc(stamp)} Uhr · ${sources}</p>` : ''}</section>`;
+  }
   function card(game, selected, stale) {
     const dt = C.dateParts(game.date, game.timed);
     const week = game.weekText || (game.week ? 'Week ' + game.week : phaseNames[game.phase]);
-    return `<article class="game ${selected ? 'current' : ''}" id="game-${esc(game.id)}" ${selected ? 'aria-current="true"' : ''} aria-label="${esc(week)}, Miami Dolphins gegen ${esc(game.opponent.team.displayName)}"><div class="game-top"><span class="week">${esc(week.toUpperCase())}</span>${gameStatus(game, selected, stale)}</div>${teamRow(game, game.mia, 0)}${teamRow(game, game.opponent, 1)}<div class="game-bottom"><div><span class="date">${esc(dt.day)}${dt.day ? ', ' : ''}${esc(dt.date)}</span><small>${game.neutral ? 'Neutraler Spielort' : game.home ? 'Heimspiel in Miami' : 'Auswärtsspiel'}</small></div><div style="text-align:right"><span class="time">${esc(dt.time)}${dt.time !== 'Offen' ? ' Uhr' : ''}</span><small>Deutsche Zeit</small></div></div><div class="venue">${icon('pin')}<span>${esc(game.venue)}${game.city ? ' · ' + esc(game.city) : ''}</span></div>${selected ? `<div class="focus-extra"><span class="countdown">${stale && game.live ? 'Gespeicherter Live-Stand' : esc(countdownText(game))}</span></div>` : ''}</article>`;
+    return `<article class="game ${selected ? 'current' : ''}" id="game-${esc(game.id)}" ${selected ? 'aria-current="true"' : ''} aria-label="${esc(week)}, Miami Dolphins gegen ${esc(game.opponent.team.displayName)}"><div class="game-top"><span class="week">${esc(week.toUpperCase())}</span>${gameStatus(game, selected, stale)}</div>${teamRow(game, game.mia, 0)}${teamRow(game, game.opponent, 1)}<div class="game-bottom"><div><span class="date">${esc(dt.day)}${dt.day ? ', ' : ''}${esc(dt.date)}</span><small>${game.neutral ? 'Neutraler Spielort' : game.home ? 'Heimspiel in Miami' : 'Auswärtsspiel'}</small></div><div style="text-align:right"><span class="time">${esc(dt.time)}${dt.time !== 'Offen' ? ' Uhr' : ''}</span><small>Deutsche Zeit</small></div></div><div class="venue">${icon('pin')}<span>${esc(game.venue)}${game.city ? ' · ' + esc(game.city) : ''}</span></div>${broadcasts(game)}${selected ? `<div class="focus-extra"><span class="countdown">${stale && game.live ? 'Gespeicherter Live-Stand' : esc(countdownText(game))}</span></div>` : ''}</article>`;
   }
   function scrollToFocus(smooth = false) {
     if (page !== 'schedule' || !focus) return;
@@ -143,6 +156,11 @@
     const regularLoaded = data.some(d => d.phase === 2);
     const bye = data.find(d => d.phase === 2)?.bye;
     let html = `<section class="hero"><div class="hero-line"><span class="tiny-mark"></span><p class="eyebrow">Miami Dolphins · Season ${season}</p></div><h1>FINS <em>UP.</em></h1><p class="hero-copy">Jedes Spiel. Jeder Punkt. Deine Dolphins.<br>Die ganze Saison – in deiner Zeit.</p></section><section class="stats" aria-label="Saisonüberblick"><div class="stat"><b>${regularLoaded ? record.w + '–' + record.l + (record.t ? '–' + record.t : '') : '–'}</b><small>Siege · Niederlagen${record.t ? ' · Remis' : ''}</small></div><div class="stat"><b>${regularLoaded ? record.played + '/' + games.filter(g => g.phase === 2 && !g.cancelled).length : '–'}</b><small>Regular Season</small></div><div class="stat"><b>${bye ? 'W' + esc(bye) : '–'}</b><small>Spielfreie Woche</small></div></section><div class="schedule-intro"><h2>Dein Spielplan</h2><span class="small-label">Alle Zeiten in Deutschland<br>Frühere Spiele ↑ · Kommende ↓</span></div>`;
+    if (games.length) {
+      const tvFresh = broadcastPacket && !broadcastPacket.stale && Date.now() - Date.parse(broadcastPacket.data.checkedAt) < 72 * 3600000;
+      const tvComplete = tvFresh && Object.values(broadcastPacket.data.sources || {}).length >= 2 && Object.values(broadcastPacket.data.sources).every(s => s === 'ok');
+      html += `<p class="tv-summary">Sender für Deutschland · Einzelspiel und Konferenz getrennt. ${season < C.currentSeason() ? 'Historische Sender werden nur angezeigt, wenn sie gespeichert wurden.' : 'Die Free-TV-Auswahl wird oft erst kurz vor dem Spiel veröffentlicht.'}${!tvComplete ? ' Die Senderauswahl ist gerade nicht vollständig aktuell; bitte beim Anbieter prüfen.' : ''}</p>`;
+    }
     if (!games.length) html += `<div class="empty"><strong>Der Spielplan folgt.</strong><p>Für ${season} sind noch keine Dolphins-Spiele veröffentlicht. Sobald sie verfügbar sind, erscheinen sie hier automatisch.</p></div>`;
     for (const phase of [1, 2, 3]) {
       const list = games.filter(g => g.phase === phase);
@@ -259,12 +277,14 @@
         });
         // The season schedule omits scores during games; scoreboard supplies live scores and clock.
         const current = requestedSeason === C.currentSeason();
-        if (current) requests.push(resource(`live:${requestedSeason}`, `${API}/scoreboard?limit=100`, data => C.scoreboardGames(data, requestedSeason)));
+        requests.push(current ? resource(`live:${requestedSeason}`, `${API}/scoreboard?limit=100`, data => C.scoreboardGames(data, requestedSeason)) : Promise.resolve(null));
+        requests.push(resource('broadcasts:de', new URL('broadcasts-de.json', location.href).href, Broadcasts.validate));
         const responses = await Promise.allSettled(requests);
         if (token !== pending) return;
         const ok = responses.slice(0, 3).filter(r => r.status === 'fulfilled').map(r => r.value);
         const missing = responses.slice(0, 3).flatMap((r, i) => r.status === 'rejected' ? [phaseNames[i + 1]] : []);
         const livePacket = responses[3]?.status === 'fulfilled' ? responses[3].value : null;
+        broadcastPacket = responses[4]?.status === 'fulfilled' ? responses[4].value : null;
         if (current && !livePacket) missing.push('Live-Spielstände');
         if (!ok.length && !livePacket) throw new Error('Spielplandaten nicht erreichbar');
         const stale = status([...ok, ...(livePacket ? [livePacket] : [])], missing);

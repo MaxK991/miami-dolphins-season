@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "country": "DE",
+  "checkedAt": "2026-09-21T07:05:24.291Z",
+  "refreshHours": 6,
+  "sources": {
+    "sky": "ok",
+    "rtl": "ok"
+  },
+  "games": {
+    "401872942": {
+      "year": 2026,
+      "stamp": 1789935900000,
+      "listings": [
+        {
+          "provider": "sky",
+          "mode": "conference",
+          "source": "https://www.sky.de/sport/nfl/sendeplan",
+          "checkedAt": "2026-09-21T07:05:24.291Z"
+        },
+        {
+          "provider": "rtl",
+          "mode": "full",
+          "source": "https://www.rtl.de/sport/nfl/nfl-week-2-diese-spiele-zeigen-rtl-und-sky-live-id31310844.html",
+          "checkedAt": "2026-09-21T07:05:24.291Z"
+        },
+        {
+          "provider": "nitro",
+          "mode": "conference",
+          "source": "https://www.rtl.de/sport/nfl/nfl-week-2-diese-spiele-zeigen-rtl-und-sky-live-id31310844.html",
+          "checkedAt": "2026-09-21T07:05:24.291Z"
+        }
+      ]
+    },
+    "401872952": {
+      "year": 2026,
+      "stamp": 1790528400000,
+      "listings": [
+        {
+          "provider": "sky",
+          "mode": "conference",
+          "source": "https://www.sky.de/sport/nfl/sendeplan",
+          "checkedAt": "2026-09-21T07:05:24.291Z"
+        }
+      ]
+    }
+  }
+}

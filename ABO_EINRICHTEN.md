@@ -1,4 +1,6 @@
-# Dolphins-Kalenderabo einmalig einrichten · v8.3
+# Dolphins-Kalenderabo einmalig einrichten · v8.5
+
+**Bereits eingerichtet?** Dann genügt das Update aus [README.md](README.md), einschließlich der beiden geänderten/neuen Dateien im Ordner `automation`. Der bestehende Workflow und dein Kalenderabo bleiben eingerichtet. Der Ablauf aktualisiert jetzt zusätzlich die deutsche Senderauswahl. Die folgenden Schritte sind für die erstmalige Einrichtung.
 
 Diese Version erstellt einen **eigenen, automatisch aktualisierten Dolphins-Kalender**. Neue Spiele, bestätigte Playoff-Termine und verlegte Anstoßzeiten werden unter derselben Abo-Adresse bereitgestellt. Die Farbe wählst du anschließend auf deinem iPhone. Der Einzelspiel-Import wurde entfernt.
 
@@ -25,7 +27,7 @@ Die Website wird danach vom unten eingerichteten Ablauf veröffentlicht. Deine b
 3. Den Dateipfad oben auf **`.github/workflows/dolphins-hub.yml`** ändern. Den Inhalt unverändert lassen. Im GitHub-Dateinamenfeld kannst du mit Rückschritt aus dem bisherigen Ordner und mit `/` in neue Ordner wechseln.
 4. Mit **Commit changes** direkt im Branch **main** speichern.
 
-Die Datei wird damit aus `automation` nach `.github/workflows` verschoben. `automation/build-site.cjs` und `automation/calendar-feed.cjs` bleiben im Ordner `automation`.
+Die Datei wird damit aus `automation` nach `.github/workflows` verschoben. `automation/build-site.cjs`, `automation/calendar-feed.cjs` und `automation/broadcast-feed.cjs` bleiben im Ordner `automation`.
 
 Falls das Ändern des Pfads unübersichtlich ist: Den gesamten Inhalt der mitgelieferten `automation/dolphins-hub.yml` kopieren. Im Hauptordner **Add file → Create new file** wählen, als Dateinamen `.github/workflows/dolphins-hub.yml` eingeben und den kopierten Inhalt einsetzen. Speichern. Die ursprüngliche Vorlage in `automation` darf in diesem Fall zusätzlich liegen bleiben.
 
@@ -35,7 +37,7 @@ Falls das Ändern des Pfads unübersichtlich ist: Den gesamten Inhalt der mitgel
 2. Links **Dolphins Hub und Kalenderabo** auswählen.
 3. Der letzte Commit startet den Ablauf normalerweise bereits. Falls noch kein Lauf gestartet wurde: **Run workflow → main → Run workflow** wählen.
 4. Warten, bis sowohl **build** als auch **deploy** einen grünen Haken haben.
-5. Die Website neu laden. Unten muss **v8.3** stehen.
+5. Die Website neu laden. Unten muss **v8.5** stehen.
 6. Unter **Spielplan → Dolphins-Kalender abonnieren** muss ein Kalenderstand erscheinen und **Auf dem iPhone abonnieren** aktiv sein.
 
 Der Ablauf erstellt die Kalenderdatei selbst. Eine lokal erzeugte `.ics`-Datei brauchst du nicht hochzuladen. Solange die Einrichtung fehlt oder der Status nicht erreichbar ist, bietet die Website keinen scheinbar fertigen Abo-Link an.
