@@ -1,19 +1,18 @@
-# Miami Dolphins Season Hub · v8.5.1
+# Miami Dolphins Season Hub · v8.5.2
 
 Dein privater Dolphins-Hub für iPhone und GitHub Pages.
 
-## Reparatur, wenn „Deine Dolphins werden geladen …“ stehen bleibt
+## Neu in v8.5.2: kompakte Senderanzeige
 
-Version 8.5.1 verhindert, dass eine fehlende Senderdatei den gesamten Spielplan beim Start blockiert. Am 21.09.2026 war im Repository bereits die neue Website vorhanden, der Ordner `automation` jedoch noch auf dem alten Stand. Dadurch fehlte `broadcasts.js` auf der veröffentlichten Website, obwohl die Datei im Repository lag.
+Die Sender stehen jetzt in einer schmalen, aufklappbaren Zeile am Spiel, beispielsweise **TV · DE | RTL · Free-TV | Game Pass · Abo**. Auf kleinen Displays dürfen die kurzen Angaben sauber umbrechen. Ein Tipp öffnet die Anbieterlinks, die getrennte Konferenz, Hinweise und Quellen. Ältere Angaben bleiben bereits in der geschlossenen Zeile als „Stand prüfen“ erkennbar. Geöffnete Senderdetails bleiben bei der automatischen Spielplanaktualisierung geöffnet.
 
-Für diesen konkreten Stand reichen **sechs Dateien** aus dem neuen Paket:
+### Dein Update von v8.5.1
 
 1. ZIP entpacken.
-2. GitHub → **Code** → Hauptordner → **Add file → Upload files**. Die vier Dateien `app.js`, `index.html`, `tabelle.html` und `playoffs.html` hochladen und ersetzen. Mit **Commit changes** speichern.
-3. Auf GitHub den vorhandenen Ordner **automation** öffnen → **Add file → Upload files**. Aus dem entpackten Unterordner `automation` die beiden Dateien **`build-site.cjs` und `broadcast-feed.cjs`** gemeinsam hochladen. Mit **Commit changes** speichern.
-4. Unter **Actions → Dolphins Hub und Kalenderabo** den neuesten Lauf abwarten, bis build und deploy grün sind. Danach die Website in Safari neu laden; unten steht **v8.5.1**.
+2. Auf GitHub im **Hauptordner** über **Add file → Upload files** genau diese fünf Dateien gemeinsam hochladen und gleichnamige Dateien ersetzen: **`app.js`, `styles.css`, `index.html`, `tabelle.html`, `playoffs.html`**.
+3. **Commit changes** bestätigen, den neuesten grünen Actions-Durchlauf abwarten und die Website neu laden. Unten steht **v8.5.2**.
 
-Die Datei `broadcast-feed.cjs` kommt neu hinzu, `build-site.cjs` wird ersetzt. Beide gehören in den bestehenden Unterordner `automation`, nicht in den Hauptordner. Der aktive Workflow unter `.github/workflows` und das Kalenderabo bleiben bestehen. Bei einem vollständigen Update kannst du auch wie bisher alle entpackten Dateien einschließlich des Ordners `automation` hochladen.
+Der bereits aktualisierte Ordner `automation`, der Workflow und das Kalenderabo bleiben unverändert. Alternativ kannst du den gesamten entpackten Inhalt wie bisher hochladen. Die folgenden Abschnitte erläutern die Senderfunktion und ein vollständiges Update von älteren Versionen.
 
 ## Neu: Wo läuft das Spiel in Deutschland?
 

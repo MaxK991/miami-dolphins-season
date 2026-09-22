@@ -1,4 +1,4 @@
-/* Dolphins Hub v8.5.1 — optional TV data must never prevent the schedule from starting. */
+/* Dolphins Hub v8.5.2 — compact broadcast summary with optional details. */
 (function () {
   'use strict';
   const C = DolphinsCore;
@@ -126,16 +126,17 @@
     return days ? `Kickoff in ${days} T ${hours % 24} Std` : hours ? `Kickoff in ${hours} Std ${mins % 60} Min` : `Kickoff in ${mins} Min`;
   }
   function broadcasts(game) {
-    if (!Broadcasts) return '<section class="game-tv" aria-label="Übertragung in Deutschland"><div class="tv-title"><span>Übertragung</span><small>DEUTSCHLAND</small></div><p class="tv-note">Senderangaben derzeit nicht verfügbar.</p></section>';
+    if (!Broadcasts) return '<div class="game-tv tv-unavailable"><span class="tv-kind">TV · DE</span><span>Senderangaben derzeit nicht verfügbar.</span></div>';
     const info = Broadcasts.resolve(game, broadcastPacket?.data, Date.now(), !!broadcastPacket?.stale);
     if (info.hidden) return '';
     const link = (provider, mode = '') => `<a class="tv-provider ${provider.free ? 'tv-free' : 'tv-paid'}" href="${esc(provider.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(provider.name + (mode ? ' · ' + mode : '') + ' · ' + (provider.free ? 'Free-TV' : 'kostenpflichtig') + ' · Anbieter öffnen')}">${esc(provider.name)}<span aria-hidden="true">↗</span></a>`;
+    const pills = info.full.map(p => `<span class="tv-pill ${p.free ? 'tv-free' : 'tv-paid'}">${esc(p.id === 'gamepass' ? 'Game Pass' : p.name)}<small>· ${p.free ? 'Free-TV' : 'Abo'}</small></span>`).join('');
     const free = info.free.length ? info.free.map(p => link(p)).join('') : `<span class="tv-unknown">${esc(info.freeNote)}</span>`;
     const paid = info.paid.length ? `<div class="tv-row"><span class="tv-kind">PAY-TV / ABO</span><div class="tv-links">${info.paid.map(p => link(p)).join('')}</div></div>` : '';
-    const conference = info.conference.length ? `<div class="tv-conference"><span>In der Konferenz · Ausschnitte aus mehreren Spielen</span><div class="tv-links">${info.conference.map(p => `<div>${link(p, 'Konferenz')}<small>${p.free ? 'Free-TV' : 'Pay-TV'}</small></div>`).join('')}</div></div>` : '';
+    const conference = info.conference.length ? `<div class="tv-conference"><span>Konferenz · Ausschnitte aus mehreren Spielen</span><div class="tv-links">${info.conference.map(p => `<div>${link(p, 'Konferenz')}<small>${p.free ? 'Free-TV' : 'Pay-TV'}</small></div>`).join('')}</div></div>` : '';
     const stamp = info.checkedAt ? new Intl.DateTimeFormat('de-DE', { timeZone: C.TZ, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(info.checkedAt) : '';
     const sources = info.sources.map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.name)}-Programm</a>`).join(' · ');
-    return `<section class="game-tv" aria-label="Übertragung in Deutschland"><div class="tv-title"><span>${info.historic ? 'Übertragung' : 'Hier läuft das Spiel'}</span><small>DEUTSCHLAND</small></div><div class="tv-row"><span class="tv-kind">FREE-TV</span><div class="tv-links">${free}</div></div>${paid}${info.gamepass ? '<p class="tv-note">Game Pass: separates Abo bei DAZN · US-Originalkommentar.</p>' : ''}${conference}${stamp ? `<p class="tv-source ${info.stale ? 'tv-stale' : ''}">${info.stale ? 'Ältere Senderangabe · bitte beim Anbieter prüfen. ' : ''}Programm geprüft: ${esc(stamp)} Uhr · ${sources}</p>` : ''}</section>`;
+    return `<details class="game-tv" data-retain="tv-${esc(game.id)}"><summary aria-label="Übertragung in Deutschland – Sender und Details"><span class="tv-kind">TV · DE</span><span class="tv-pills">${pills || `<span class="tv-unknown">${info.historic ? 'Keine Senderdaten' : info.conference.length ? 'Nur Konferenz bestätigt' : 'Sender noch offen'}</span>`}${info.stale ? '<span class="tv-stale">Stand prüfen</span>' : ''}</span><span class="tv-toggle" aria-hidden="true">⌄</span></summary><div class="tv-details"><div class="tv-row"><span class="tv-kind">FREE-TV</span><div class="tv-links">${free}</div></div>${paid}${info.gamepass ? '<p class="tv-note">Game Pass: separates Abo bei DAZN · US-Originalkommentar.</p>' : ''}${conference}${stamp ? `<p class="tv-source ${info.stale ? 'tv-stale' : ''}">${info.stale ? 'Ältere Senderangabe · bitte beim Anbieter prüfen. ' : ''}Programm geprüft: ${esc(stamp)} Uhr · ${sources}</p>` : ''}</div></details>`;
   }
   function card(game, selected, stale) {
     const dt = C.dateParts(game.date, game.timed);
@@ -151,6 +152,7 @@
   }
   function renderSchedule(data, stale, missing, livePacket = null) {
     const previousId = focus?.id;
+    const openTV = new Set([...document.querySelectorAll('.game-tv[open]')].map(el => el.dataset.retain));
     games = C.mergeScoreboard(data.flatMap(d => d.games), livePacket ? C.scoreboardGames(livePacket.data, season) : [], !!livePacket?.stale);
     focus = C.focusGame(games);
     const record = C.record(games);
@@ -160,7 +162,7 @@
     if (games.length) {
       const tvFresh = broadcastPacket && !broadcastPacket.stale && Date.now() - Date.parse(broadcastPacket.data.checkedAt) < 72 * 3600000;
       const tvComplete = tvFresh && Object.values(broadcastPacket.data.sources || {}).length >= 2 && Object.values(broadcastPacket.data.sources).every(s => s === 'ok');
-      html += `<p class="tv-summary">Sender für Deutschland · Einzelspiel und Konferenz getrennt. ${season < C.currentSeason() ? 'Historische Sender werden nur angezeigt, wenn sie gespeichert wurden.' : 'Die Free-TV-Auswahl wird oft erst kurz vor dem Spiel veröffentlicht.'}${!tvComplete ? ' Die Senderauswahl ist gerade nicht vollständig aktuell; bitte beim Anbieter prüfen.' : ''}</p>`;
+      html += `<details class="tv-summary"><summary>TV & Streaming · Deutschland</summary><p>Einzelspiel und Konferenz getrennt. ${season < C.currentSeason() ? 'Historische Sender werden nur angezeigt, wenn sie gespeichert wurden.' : 'Die Free-TV-Auswahl wird oft erst kurz vor dem Spiel veröffentlicht.'}${!tvComplete ? ' Die Senderauswahl ist gerade nicht vollständig aktuell; bitte beim Anbieter prüfen.' : ''}</p></details>`;
     }
     if (!games.length) html += `<div class="empty"><strong>Der Spielplan folgt.</strong><p>Für ${season} sind noch keine Dolphins-Spiele veröffentlicht. Sobald sie verfügbar sind, erscheinen sie hier automatisch.</p></div>`;
     for (const phase of [1, 2, 3]) {
@@ -171,6 +173,7 @@
     }
     if (missing.length) html += `<div class="empty"><strong>Ein Teil der Daten fehlt gerade.</strong><p>${esc(missing.join(', '))} konnten nicht geladen werden.</p><button class="retry" data-retry>Erneut versuchen</button></div>`;
     $('content').innerHTML = html;
+    document.querySelectorAll('.game-tv[data-retain]').forEach(el => { if (openTV.has(el.dataset.retain)) el.setAttribute('open', ''); });
     $('jumpButton').hidden = !focus;
     $('jumpButton').querySelector('span').textContent = focus?.complete ? 'Letztes Spiel' : 'Aktuelles Spiel';
     clearInterval(countdownTimer);

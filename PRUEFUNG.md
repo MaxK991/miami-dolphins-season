@@ -1,14 +1,25 @@
-# Prüfübersicht · Dolphins Hub v8.5.1
+# Prüfübersicht · Dolphins Hub v8.5.2
 
 Stand: 21.09.2026
 
 ## Ergebnis
 
-**70 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 27 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 12 Sender-/Bereitstellungstests.
+**Stand der Datenlogik v8.5.1: 70 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 27 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 12 Sender-/Bereitstellungstests.
 
 Zusätzlich wurde die vollständige Kalendererzeugung mit frisch direkt von ESPN geladenen Daten ausgeführt: 20 Dolphins-Spiele der Saison 2026, davon **19 mit bestätigter Anstoßzeit** im Kalender. Week 18 gegen New England hat noch keine bestätigte Anstoßzeit und wird daher noch nicht als Kalendertermin angelegt.
 
 Der Probelauf wurde ausdrücklich als lokal gekennzeichnet (`automatic: false`). Er wird nicht als aktiviertes Kalenderabo ausgegeben. Erst der eingerichtete GitHub-Ablauf veröffentlicht Kalender und Status mit `automatic: true`.
+
+## Darstellung v8.5.2
+
+Für die kompakte Darstellung wurden die **27 bestehenden DOM-Integrationstests erneut erfolgreich ausgeführt**. Die Senderprüfung kontrolliert zusätzlich die standardmäßig geschlossene Detailansicht, sichtbare Free-TV-/Abo-Kennzeichnungen in der Zusammenfassung und die Trennung der Konferenz von den Einzelspielen. Anbieterlinks, fehlende Quellen und der Start ohne optionales Sendermodul bleiben geprüft.
+
+- Senderzusammenfassung ohne wiederholten Titel und lange Hinweistexte.
+- Anbieterlinks, Konferenz und Quellen in nativen aufklappbaren Details.
+- Mindestens 44 Pixel hohe Tippfläche; kurze Anbieterangaben dürfen bei schmalen Displays umbrechen.
+- Veraltete bestätigte Senderangaben sind auch geschlossen gekennzeichnet.
+- Keine Änderungen an Senderzuordnung, Kalender oder GitHub-Automatik.
+- Die DOM-Prüfung ersetzt keine optische Safari-/iPhone-Prüfung; die Darstellung auf einem echten Gerät ist hier nicht verifiziert.
 
 ## Reparatur v8.5.1: Startabbruch bei unvollständiger Veröffentlichung
 
