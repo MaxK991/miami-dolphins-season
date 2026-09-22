@@ -1,0 +1,52 @@
+# Install this file as .github/workflows/dolphins-hub.yml in the repository.
+name: Dolphins Hub und Kalenderabo
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: GitHub Pages vorbereiten
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Website und aktuellen Abo-Kalender erstellen
+        env:
+          SITE_BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: node automation/build-site.cjs
+      - name: Website bereitstellen
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Website und Kalender veröffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v4

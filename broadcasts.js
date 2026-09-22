@@ -45,7 +45,7 @@
     const historic = game.complete || (game.stamp && game.stamp < now - 12 * 3600000);
     return { full, free, paid, conference, sources, historic, checkedAt: Number.isFinite(oldest) ? oldest : null,
       stale: Number.isFinite(oldest) && !historic && (cached || now - oldest > 72 * 3600000),
-      freeNote: free.length ? '' : historic ? 'Keine Free-TV-Angabe gespeichert' : 'Free-TV noch nicht bestätigt',
+      freeNote: free.length ? '' : conference.some(p => p.free) ? 'Kostenlos in der Konferenz · siehe unten' : historic ? 'Keine Free-TV-Angabe gespeichert' : 'Kein Free-TV-Einzelspiel hinterlegt',
       gamepass: paid.some(p => p.id === 'gamepass') };
   }
   return { PROVIDERS, GAME_PASS_SEASON, GAME_PASS_SOURCE, sourceURL, validate, resolve };

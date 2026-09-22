@@ -1,14 +1,24 @@
-# Prüfübersicht · Dolphins Hub v8.5.2
+# Prüfübersicht · Dolphins Hub v8.5.3
 
-Stand: 21.09.2026
+Stand: 22.09.2026
 
 ## Ergebnis
 
-**Stand der Datenlogik v8.5.1: 70 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 27 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 12 Sender-/Bereitstellungstests.
+**71 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 27 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 13 Sender-/Bereitstellungstests.
 
 Zusätzlich wurde die vollständige Kalendererzeugung mit frisch direkt von ESPN geladenen Daten ausgeführt: 20 Dolphins-Spiele der Saison 2026, davon **19 mit bestätigter Anstoßzeit** im Kalender. Week 18 gegen New England hat noch keine bestätigte Anstoßzeit und wird daher noch nicht als Kalendertermin angelegt.
 
 Der Probelauf wurde ausdrücklich als lokal gekennzeichnet (`automatic: false`). Er wird nicht als aktiviertes Kalenderabo ausgegeben. Erst der eingerichtete GitHub-Ablauf veröffentlicht Kalender und Status mit `automatic: true`.
+
+## Korrektur v8.5.3
+
+- RTL-Originalartikel Woche 3 vom 22.09.2026 geladen und analysiert: fünf Spalten, weil Wochentag und Datum getrennt sind. Der bisherige Parser akzeptierte nur vier Spalten und lehnte die Liste deshalb ab.
+- Beide Formate werden jetzt akzeptiert. Unbekannte Zusatzspalten bleiben abgewiesen; Datum, Kickoff, Paarung und Heimrecht werden weiterhin geprüft.
+- Regressionstest mit einer minimalen, nach dem veröffentlichten Muster erstellten Liste: RTL+ wird als kostenpflichtiges Einzelspiel erkannt, NITRO getrennt als kostenlose Konferenz.
+- Zusätzlich am vollständig frisch geladenen Original-HTML erfolgreich geprüft: Chiefs bei den Dolphins am 27.09.2026, RTL+ als Einzelspiel und NITRO als Konferenz.
+- Bestätigte kostenlose Konferenzen erzeugen keinen pauschalen Hinweis auf unbestätigtes Free-TV mehr. Fehlende Einzelspiel-Zuordnung wird ausdrücklich als fehlender Datenbankeintrag bezeichnet.
+- Das gesamte bestehende Testpaket einschließlich des neuen Formatfalls wurde erfolgreich ausgeführt: 71 Tests.
+- Sender-Anfangsstand ergänzt; ältere Sky-Einträge werden nicht als frisch geprüft ausgegeben.
 
 ## Darstellung v8.5.2
 

@@ -1,25 +1,32 @@
-# Miami Dolphins Season Hub · v8.5.2
+# Miami Dolphins Season Hub · v8.5.3
 
 Dein privater Dolphins-Hub für iPhone und GitHub Pages.
 
-## Neu in v8.5.2: kompakte Senderanzeige
+## Korrektur v8.5.3: RTL-Auswahl und Free-TV-Hinweis
 
-Die Sender stehen jetzt in einer schmalen, aufklappbaren Zeile am Spiel, beispielsweise **TV · DE | RTL · Free-TV | Game Pass · Abo**. Auf kleinen Displays dürfen die kurzen Angaben sauber umbrechen. Ein Tipp öffnet die Anbieterlinks, die getrennte Konferenz, Hinweise und Quellen. Ältere Angaben bleiben bereits in der geschlossenen Zeile als „Stand prüfen“ erkennbar. Geöffnete Senderdetails bleiben bei der automatischen Spielplanaktualisierung geöffnet.
+Die RTL-Wochenübersicht enthält seit Woche 3 eine zusätzliche Trennung zwischen Wochentag und Datum. Der Abruf verarbeitet jetzt sowohl die bisherige Liste mit vier als auch die neue Liste mit fünf Spalten. Die kompakte Senderanzeige bleibt erhalten.
 
-### Dein Update von v8.5.1
+Für Chiefs bei den Dolphins am 27.09.2026 meldet das [aktuelle RTL-Programm](https://www.rtl.de/sport/nfl/nfl-2026-diese-spiele-zeigen-rtl-und-sky-live-in-woche-3-id31334372.html) ein Einzelspiel auf RTL+ und Ausschnitte in der kostenlosen NITRO-Konferenz. Beide Zuordnungen wurden mit dem neuen Parser am Originalartikel geprüft und sind im beigefügten Anfangsstand enthalten. Alte Sky-Daten behalten ihren alten Prüfzeitpunkt.
 
-1. ZIP entpacken.
-2. Auf GitHub im **Hauptordner** über **Add file → Upload files** genau diese fünf Dateien gemeinsam hochladen und gleichnamige Dateien ersetzen: **`app.js`, `styles.css`, `index.html`, `tabelle.html`, `playoffs.html`**.
-3. **Commit changes** bestätigen, den neuesten grünen Actions-Durchlauf abwarten und die Website neu laden. Unten steht **v8.5.2**.
+Bei einer bestätigten kostenlosen Konferenz lautet der Hinweis nun **„Kostenlos in der Konferenz · siehe unten“**. Fehlt eine Zuordnung für ein künftiges Free-TV-Einzelspiel, steht **„Kein Free-TV-Einzelspiel hinterlegt“**. Das beschreibt den Datenstand und behauptet nicht, dass Sender ihre Auswahl noch nicht veröffentlicht hätten.
 
-Der bereits aktualisierte Ordner `automation`, der Workflow und das Kalenderabo bleiben unverändert. Alternativ kannst du den gesamten entpackten Inhalt wie bisher hochladen. Die folgenden Abschnitte erläutern die Senderfunktion und ein vollständiges Update von älteren Versionen.
+### Update von v8.5.2
+
+ZIP entpacken und auf GitHub diese Dateien ersetzen:
+
+| Ordner auf GitHub | Dateien |
+| --- | --- |
+| Hauptordner | `app.js`, `broadcasts.js`, `broadcasts-de.json`, `index.html`, `tabelle.html`, `playoffs.html` |
+| Bestehender Ordner `automation` | `broadcast-feed.cjs` |
+
+Die Datei `broadcast-feed.cjs` unbedingt **im vorhandenen GitHub-Unterordner `automation`** ersetzen. Danach den neuesten erfolgreichen Actions-Durchlauf abwarten und Safari neu laden. Die Website zeigt v8.5.3. Alternativ ist ein vollständiger Upload aller entpackten Dateien einschließlich `automation` möglich. Workflow und Kalenderabo bleiben bestehen.
 
 ## Neu: Wo läuft das Spiel in Deutschland?
 
 Jede Spielkarte im Spielplan zeigt **Free-TV**, **Pay-TV / Abo** und gegebenenfalls eine getrennte **Konferenz**. Die Anbieter lassen sich antippen. RTL+ ist kostenpflichtig; eine NITRO-Konferenz bedeutet nicht, dass dort das gesamte Dolphins-Spiel einzeln läuft.
 
 - Die deutsche RTL-Wochenauswahl und der Sky-Sendeplan werden im vorhandenen GitHub-Ablauf alle sechs Stunden abgerufen. Team-Paarung, Heimrecht, Datum und Uhrzeit müssen zum Dolphins-Spiel passen.
-- Noch nicht veröffentlichte Free-TV-Sender erscheinen als **„Free-TV noch nicht bestätigt“**. Aus fehlenden Daten wird niemals „nur Pay-TV“ abgeleitet.
+- Noch nicht veröffentlichte Free-TV-Sender erscheinen als **„Kein Free-TV-Einzelspiel hinterlegt“**. Aus fehlenden Daten wird niemals „nur Pay-TV“ abgeleitet.
 - **NFL Game Pass bei DAZN** erscheint als eigenes kostenpflichtiges Abo für die geprüfte Saison 2026, einschließlich Dolphins-Playoffs. Es wird kein gewöhnliches DAZN-Paket vorausgesetzt. Die allgemeine Game-Pass-Zuordnung muss bei einem späteren Saisonwechsel anhand der dann geltenden Rechte überprüft werden; die RTL-/Sky-Programmsuche läuft weiter automatisch.
 - Konferenzen sind klar als Ausschnitte mehrerer Spiele gekennzeichnet. Programmquellen und Prüfzeitpunkt stehen an bestätigten Senderangaben.
 - Ältere oder nicht vollständig abrufbare Senderdaten werden gekennzeichnet. Der Ausfall einer Programmquelle stoppt weder Spielstände noch Kalenderabo.

@@ -1,4 +1,4 @@
-/* Dolphins Hub v8.5.2 — compact broadcast summary with optional details. */
+/* Dolphins Hub v8.5.3 — compact broadcast summary with optional details. */
 (function () {
   'use strict';
   const C = DolphinsCore;
