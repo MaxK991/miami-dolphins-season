@@ -1,25 +1,30 @@
-# Miami Dolphins Season Hub · v8.5.3
+# Miami Dolphins Season Hub · v8.5.4
 
 Dein privater Dolphins-Hub für iPhone und GitHub Pages.
 
-## Korrektur v8.5.3: RTL-Auswahl und Free-TV-Hinweis
+## Neu in v8.5.4: anklickbare Anbieterlogos
 
-Die RTL-Wochenübersicht enthält seit Woche 3 eine zusätzliche Trennung zwischen Wochentag und Datum. Der Abruf verarbeitet jetzt sowohl die bisherige Liste mit vier als auch die neue Liste mit fünf Spalten. Die kompakte Senderanzeige bleibt erhalten.
+Unter den Spielen stehen nur noch kleine Logos der zugeordneten Anbieter. Ein Tipp öffnet direkt deren Website. Die aufklappbare TV-Box, Free-TV-/Pay-TV-Textzeilen und Meldungen über nicht hinterlegte Einzelspiele entfallen.
 
-Für Chiefs bei den Dolphins am 27.09.2026 meldet das [aktuelle RTL-Programm](https://www.rtl.de/sport/nfl/nfl-2026-diese-spiele-zeigen-rtl-und-sky-live-in-woche-3-id31334372.html) ein Einzelspiel auf RTL+ und Ausschnitte in der kostenlosen NITRO-Konferenz. Beide Zuordnungen wurden mit dem neuen Parser am Originalartikel geprüft und sind im beigefügten Anfangsstand enthalten. Alte Sky-Daten behalten ihren alten Prüfzeitpunkt.
+- DAZN trägt den kleinen Zusatz **Game Pass**, damit der separate Zugang klar bleibt.
+- Anbieter, die nur Ausschnitte mehrerer Spiele zeigen, tragen den Zusatz **Konferenz**.
+- Ein Anbieter wird höchstens einmal pro Spiel angezeigt; ein bestätigtes Einzelspiel hat Vorrang vor der Konferenz desselben Anbieters.
+- Anbietername, Angebotsart und Kostenpflicht sind zusätzlich als zugängliche Linkbeschriftung und Tooltip hinterlegt.
+- Ältere bestätigte Angaben behalten einen kleinen Hinweis **Stand prüfen**. Bei unvollständigen Quellen gibt es einen gemeinsamen kurzen Hinweis über dem Spielplan.
+- Ohne zugeordnete Anbieter bleibt der Bereich leer. Es werden keine Sender erfunden.
+- Die Logos sind in `app.js` eingebettet: keine zusätzlichen Bilddateien, keine externen Logo-Abfragen im Browser, keine neue Upload-Struktur.
 
-Bei einer bestätigten kostenlosen Konferenz lautet der Hinweis nun **„Kostenlos in der Konferenz · siehe unten“**. Fehlt eine Zuordnung für ein künftiges Free-TV-Einzelspiel, steht **„Kein Free-TV-Einzelspiel hinterlegt“**. Das beschreibt den Datenstand und behauptet nicht, dass Sender ihre Auswahl noch nicht veröffentlicht hätten.
+### Update von v8.5.3
 
-### Update von v8.5.2
+ZIP entpacken und im GitHub-**Hauptordner** diese sechs Dateien gemeinsam ersetzen:
 
-ZIP entpacken und auf GitHub diese Dateien ersetzen:
+`app.js`, `styles.css`, `broadcasts.js`, `index.html`, `tabelle.html`, `playoffs.html`
 
-| Ordner auf GitHub | Dateien |
-| --- | --- |
-| Hauptordner | `app.js`, `broadcasts.js`, `broadcasts-de.json`, `index.html`, `tabelle.html`, `playoffs.html` |
-| Bestehender Ordner `automation` | `broadcast-feed.cjs` |
+Danach **Commit changes**, den neuesten grünen Actions-Durchlauf abwarten und die Website neu laden. Unten steht **v8.5.4**. Der bereits eingerichtete Ordner `automation`, der Workflow und das Kalenderabo bleiben unverändert. Die Korrektur des RTL-Listenformats aus v8.5.3 ist weiterhin enthalten.
 
-Die Datei `broadcast-feed.cjs` unbedingt **im vorhandenen GitHub-Unterordner `automation`** ersetzen. Danach den neuesten erfolgreichen Actions-Durchlauf abwarten und Safari neu laden. Die Website zeigt v8.5.3. Alternativ ist ein vollständiger Upload aller entpackten Dateien einschließlich `automation` möglich. Workflow und Kalenderabo bleiben bestehen.
+### Herkunft der Logos
+
+RTL und RTL+: SVG-Wortmarken aus der offiziellen RTL-Webseite. NITRO: offizielles App-Icon von `nitro-tv.de`, per CSS auf die Wortmarke begrenzt. Sky: offizielles Logo der Sky-NFL-Webseite. DAZN: Marken-SVG aus [Simple Icons](https://simpleicons.org/). Eingebettete Anbieterlogos kennzeichnen nur die verlinkten Angebote; das Projekt bleibt eine private Fanseite.
 
 ## Neu: Wo läuft das Spiel in Deutschland?
 

@@ -1,14 +1,25 @@
-# Prüfübersicht · Dolphins Hub v8.5.3
+# Prüfübersicht · Dolphins Hub v8.5.4
 
 Stand: 22.09.2026
 
 ## Ergebnis
 
-**71 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 27 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 13 Sender-/Bereitstellungstests.
+**Stand v8.5.3: 71 automatisierte Tests erfolgreich:** 15 Tests für Spielplan-/Tabellenlogik, 27 DOM-Integrationstests, 9 Kalender-/Bereitstellungstests, 7 Playoff-Datentests und 13 Sender-/Bereitstellungstests.
 
 Zusätzlich wurde die vollständige Kalendererzeugung mit frisch direkt von ESPN geladenen Daten ausgeführt: 20 Dolphins-Spiele der Saison 2026, davon **19 mit bestätigter Anstoßzeit** im Kalender. Week 18 gegen New England hat noch keine bestätigte Anstoßzeit und wird daher noch nicht als Kalendertermin angelegt.
 
 Der Probelauf wurde ausdrücklich als lokal gekennzeichnet (`automatic: false`). Er wird nicht als aktiviertes Kalenderabo ausgegeben. Erst der eingerichtete GitHub-Ablauf veröffentlicht Kalender und Status mit `automatic: true`.
+
+## Darstellung v8.5.4: Logozeile
+
+Die **27 bestehenden DOM-Integrationstests** wurden nach der Änderung erneut erfolgreich ausgeführt. Anbieterlogos wurden zusätzlich separat gerendert und visuell auf Erkennbarkeit geprüft. Dies ist kein echter Safari-Layouttest.
+
+- Direkte HTTPS-Anbieterlinks mit eingebetteten Bilddaten, Alternativtext, zugänglicher Beschriftung und `noopener noreferrer` geprüft.
+- RTL-Einzelspiel, NITRO-/Sky-Konferenz und separates Game-Pass-Abo bleiben unterscheidbar; kein Details-Aufklappen mehr erforderlich.
+- Ohne Senderdatei oder ohne historischen Senderdatensatz erscheinen keine irreführenden Anbieterlogos. Spielplan, Live-Punkte, Navigation und Kalender funktionieren weiter.
+- Alte Senderangaben erhalten weiterhin einen sichtbaren Aktualitätshinweis.
+- Kleine Logos mit mindestens 44 Pixel hohen Tippflächen und flexiblem Zeilenumbruch.
+- Keine neuen Dateien in der Website-Ausgabe erforderlich; Automationsdateien unverändert.
 
 ## Korrektur v8.5.3
 

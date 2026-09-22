@@ -6,7 +6,7 @@
   'use strict';
   const PROVIDERS = {
     rtl: { name: 'RTL', free: true, url: 'https://www.rtl.de/sport/nfl/' },
-    nitro: { name: 'NITRO', free: true, url: 'https://www.rtl.de/sport/nfl/' },
+    nitro: { name: 'NITRO', free: true, url: 'https://www.nitro-tv.de/' },
     rtlplus: { name: 'RTL+', free: false, url: 'https://plus.rtl.de/' },
     sky: { name: 'Sky Sport', free: false, url: 'https://www.sky.de/sport/nfl/sendeplan' },
     gamepass: { name: 'NFL Game Pass · DAZN', free: false, url: 'https://www.dazn.com/de-DE/welcome/nfl' }
